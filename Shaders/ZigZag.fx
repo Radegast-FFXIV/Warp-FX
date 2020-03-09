@@ -68,7 +68,7 @@ uniform float phase <
 uniform int animate <
     ui_type = "combo";
     ui_label = "Animate";
-    ui_items = "No\0Amplitude\0Phase";
+    ui_items = "No\0Amplitude\0Phase\0";
     ui_tooltip = "Enable or disable the animation. Animates the zigzag effect by phase or by amplitude.";
 > = 0;
 
