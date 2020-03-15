@@ -52,7 +52,7 @@ uniform float z_rotation <
     #else
         ui_type = "slider";
     #endif
-    ui_min = 0.0; ui_max = 2.0;
+    ui_min = 0.0; ui_max = 360.0;
 > = 0.5;
 
 
