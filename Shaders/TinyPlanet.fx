@@ -1,4 +1,7 @@
-
+/*-----------------------------------------------------------------------------------------------------*/
+/* Tiny Planet Shader v1.0 - by Radegast Stravinsky of Ultros.                                         */
+/* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
+/*-----------------------------------------------------------------------------------------------------*/
 #define PI 3.141592358
 
 uniform float center_x <
