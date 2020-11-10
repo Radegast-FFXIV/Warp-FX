@@ -20,6 +20,15 @@ uniform float angle <
     ui_min = -1800.0; ui_max = 1800.0; ui_step = 1.0;
 > = 0.0;
 
+uniform float tension <
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
+    ui_min = 0.; ui_max = 10.; ui_step = 0.001;
+> = 1.0;
+
 uniform float center_x <
     #if __RESHADE__ < 40000
         ui_type = "drag";
@@ -75,6 +84,11 @@ sampler samplerColor
     AddressV = WRAP;
     AddressW = WRAP;
 
+    Width = BUFFER_WIDTH;
+    Height = BUFFER_HEIGHT;
+    MipLevels = LINEAR;
+    Format = RGBA8;
+    
     MagFilter = LINEAR;
     MinFilter = LINEAR;
     MipFilter = LINEAR;
@@ -104,16 +118,6 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
     texcoord.y = (id == 1) ? 2.0 : 0.0;
     
     position = float4( texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
-    //position /= BUFFER_HEIGHT/BUFFER_WIDTH;
-
-}
-
-void SwirlVS(uint id : SV_VertexId, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
-{
-    texcoord.x = radius;
-    texcoord.y = radius;
-
-    position = float4( texcoord * float2(2, -2) + float2(-1,1), 0, 1);
 }
 
 void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
@@ -121,23 +125,22 @@ void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out floa
     color = tex2D(samplerColor, texcoord);
 }
 
-float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
+void Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
 {
-    float ar = BUFFER_WIDTH > BUFFER_HEIGHT ? (float)BUFFER_WIDTH/(float)BUFFER_HEIGHT : (float)BUFFER_HEIGHT/BUFFER_WIDTH;
-    float2 center = float2(center_x, center_y);
-
-    if(BUFFER_WIDTH > BUFFER_HEIGHT)
-        texcoord.x *= ar;
-    else
-        texcoord.y *= ar;
-    float2 tc = texcoord - center;
-;
     
+    float ar = 1. * BUFFER_HEIGHT/BUFFER_WIDTH;
+    float2 center = float2(center_x, center_y);
+    float2 tc = texcoord - center;
+
+    center.x /= ar;
+    tc.x /= ar;
 
     float dist = distance(tc, center);
+    
     if (dist < radius)
     {
-        float percent = (radius-dist)/(radius);
+        float tension_radius = lerp(radius-dist, radius, tension);
+        float percent = (radius-dist)/tension_radius;
         percent = inverse == 0 ? percent : 1 - percent;
         float theta = percent * percent * radians(angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
         float s =  sin(theta);
@@ -145,21 +148,13 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         tc = float2(dot(tc-center, float2(c,-s)), dot(tc-center, float2(s,c)));
 
         tc += (2*center);
+        tc.x *= ar;
 
-        if(BUFFER_WIDTH > BUFFER_HEIGHT)
-            tc.x /= ar;
-        else
-            tc.y /= ar;
-        
-        return tex2D(samplerTarget, tc);
+        color = tex2D(samplerColor, tc);
     }
     else
     {
-        if(BUFFER_WIDTH > BUFFER_HEIGHT)
-            texcoord.x /= ar;
-        else
-            texcoord.y /= ar;
-        return tex2D(samplerTarget, texcoord);
+        color = tex2D(samplerColor, texcoord);
     }
         
 }
