@@ -56,6 +56,15 @@ uniform float center_y <
     ui_min = 0.0; ui_max = 1.0;
 > = 0.5;
 
+uniform float tension <
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
+    ui_min = 0.; ui_max = 10.; ui_step = 0.001;
+> = 1.0;
+
 uniform float phase <
     #if __RESHADE__ < 40000
         ui_type = "drag";
@@ -156,7 +165,8 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     float dist = distance(tc, center);
     if (dist < radius)
     {
-        float percent = (radius-dist)/radius;
+        float tension_radius = lerp(radius-dist, radius, tension);
+        float percent = (radius-dist)/tension_radius;
         
         //float theta = ar * sin(percent * radians(angle) + phase) * amplitude;
         float theta = percent * percent * (animate == 1 ? amplitude * sin(anim_rate * 0.0005) : amplitude) * sin(percent * percent / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate : 0)));
