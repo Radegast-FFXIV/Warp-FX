@@ -54,16 +54,16 @@ uniform int animate <
     ui_tooltip = "Animates the swirl, moving it clockwise and counterclockwise.";
 > = 0;
 
+uniform float anim_rate <
+    source = "timer";
+>;
+
 uniform int inverse <
     ui_type = "combo";
     ui_label = "Inverse Angle";
     ui_items = "No\0Yes\0";
     ui_tooltip = "Inverts the angle of the swirl, making the edges the most distorted.";
 > = 0;
-
-uniform float anim_rate <
-    source = "timer";
->;
 
 texture texColorBuffer : COLOR;
 texture texDepthBuffer : DEPTH;

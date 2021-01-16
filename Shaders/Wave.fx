@@ -1,0 +1,183 @@
+/*-----------------------------------------------------------------------------------------------------*/
+/* Wave Shader v3.0 - by Radegast Stravinsky of Ultros.                                                */
+/* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
+/*-----------------------------------------------------------------------------------------------------*/
+
+uniform float angle <
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
+    ui_min = -999.0; ui_max = 999.0; ui_step = 1.0;
+> = 180.0;
+
+uniform float period <
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
+    ui_min = 0.1; ui_max = 10.0;
+    ui_tooltip = "The wavelength of the distortion. Smaller values make for a longer wavelength.";
+> = 0.5;
+
+uniform float amplitude <
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
+    ui_min = -1.0; ui_max = 1.0;
+    ui_tooltip = "The amplitude of the distortion in each direction.";
+> = 0.0;
+
+uniform float phase <
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
+    ui_min = -5.0; ui_max = 5.0;
+    ui_tooltip = "The offset being applied to the distortion's waves. Smaller is longer.";
+> = 0.0;
+
+uniform int animate <
+    ui_type = "combo";
+    ui_label = "Animate";
+    ui_items = "No\0Amplitude\0Phase\0Angle\0";
+    ui_tooltip = "Enable or disable the animation. Animates the wave effect by phase, amplitude, or angle.";
+> = 0;
+
+uniform float anim_rate <
+    source = "timer";
+>;
+
+
+texture texColorBuffer : COLOR;
+texture texDepthBuffer : DEPTH;
+
+texture waveTarget
+{
+    Width = BUFFER_WIDTH;
+    Height = BUFFER_HEIGHT;
+    MipLevels = LINEAR;
+    Format = RGBA8;
+};
+
+sampler samplerColor
+{
+    Texture = texColorBuffer;
+
+    AddressU = WRAP;
+    AddressV = WRAP;
+    AddressW = WRAP;
+
+    MagFilter = LINEAR;
+    MinFilter = LINEAR;
+    MipFilter = LINEAR;
+
+    MinLOD = 0.0f;
+    MaxLOD = 1000.0f;
+
+    MipLODBias = 0.0f;
+
+    SRGBTexture = false;
+};
+
+sampler samplerDepth
+{
+    Texture = texDepthBuffer;
+};
+
+sampler samplerTarget
+{
+    Texture = waveTarget;
+};
+
+
+//TODO: Learn what this vertex shader really does.
+void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
+{
+    texcoord.x = (id == 2) ? 2.0 : 0.0;
+    texcoord.y = (id == 1) ? 2.0 : 0.0;
+    
+    position = float4( texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
+
+}
+
+void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
+{
+    color = tex2D(samplerColor, texcoord);
+}
+
+float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET 
+{
+    
+    float ar = 1. * BUFFER_HEIGHT/BUFFER_WIDTH;
+    float2 center = float2(0.5f, 0.5f);
+
+    center.x /= ar;
+    texcoord.x /= ar;
+
+    float theta = radians(animate == 3 ? (anim_rate * 0.01 % 360.0) : angle);
+    float s =  sin(theta);
+    float _s = sin(-theta);
+    float c =  cos(theta);
+    float _c = cos(-theta);
+    
+    texcoord = float2(dot(texcoord-center, float2(c,-s)), dot(texcoord-center, float2(s,c)));
+    texcoord.x += (animate == 1 ? sin(anim_rate * 0.001) * amplitude : amplitude) * sin((texcoord.y * period * 10)  + (animate == 2 ?  anim_rate * 0.001 : phase));
+    texcoord = float2(dot(texcoord, float2(_c,-_s)), dot(texcoord, float2(_s,_c)));
+    texcoord += center;
+
+        texcoord.x *= ar;
+
+    return tex2D(samplerTarget, texcoord);
+
+}
+technique Wave
+{
+    pass p0
+    {
+       
+        VertexShader = FullScreenVS;
+        PixelShader = DoNothingPS;
+
+        RenderTarget = waveTarget;
+        ClearRenderTargets = true;
+
+        RenderTargetWriteMask = 0xF;
+
+        SRGBWriteEnable = false;
+
+        BlendEnable = false;
+
+        BlendOp = ADD;
+        BlendOpAlpha = ADD;
+
+        SrcBlend = ONE;
+        //SrcBlendAlpha = ONE;
+        DestBlend = ZERO;
+
+        StencilEnable = false;
+
+        StencilReadMask = 0xFF; // or StencilMask
+        StencilWriteMask = 0xFF;
+
+        StencilFunc = ALWAYS;
+
+        StencilRef = 0;
+
+        StencilPassOp = KEEP; 
+        StencilFailOp = KEEP; 
+        StencilDepthFailOp = KEEP; 
+
+    }
+
+    pass p1
+    {
+        VertexShader = FullScreenVS;
+        PixelShader = Wave;
+    }
+}

@@ -20,6 +20,15 @@ uniform float magnitude <
     ui_min = -1.0; ui_max = 1.0;
 > = 0.0;
 
+uniform float tension <
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
+    ui_min = 0.; ui_max = 10.; ui_step = 0.001;
+> = 1.0;
+
 uniform float center_x <
     #if __RESHADE__ < 40000
         ui_type = "drag";
@@ -133,7 +142,8 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
     if (dist < radius)
     {
         float anim_mag = (animate == 1 ? magnitude * sin(radians(anim_rate * 0.05)) : magnitude);
-        float percent = dist/radius;
+        float tension_radius = lerp(dist, radius, tension);
+        float percent = (dist)/tension_radius;
         if(anim_mag > 0)
             tc = (tc-center) * lerp(1.0, smoothstep(0.0, radius/dist, percent), anim_mag * 0.75);
         else
