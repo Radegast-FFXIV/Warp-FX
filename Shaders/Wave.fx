@@ -3,13 +3,20 @@
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 
+uniform int wave_type <
+    ui_type = "combo";
+    ui_label = "Wave Type";
+    ui_items = "X/X\0X/Y\0";
+    ui_tooltip = "Which axis the distortion should be performed against.";
+> = 1;
+
 uniform float angle <
     #if __RESHADE__ < 40000
         ui_type = "drag";
     #else
         ui_type = "slider";
     #endif
-    ui_min = -999.0; ui_max = 999.0; ui_step = 1.0;
+    ui_min = -360.0; ui_max = 360.0; ui_step = 1.0;
 > = 180.0;
 
 uniform float period <
@@ -125,9 +132,12 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     float _s = sin(-theta);
     float c =  cos(theta);
     float _c = cos(-theta);
-    
+
     texcoord = float2(dot(texcoord-center, float2(c,-s)), dot(texcoord-center, float2(s,c)));
-    texcoord.x += (animate == 1 ? sin(anim_rate * 0.001) * amplitude : amplitude) * sin((texcoord.y * period * 10)  + (animate == 2 ?  anim_rate * 0.001 : phase));
+    if(wave_type == 0)
+        texcoord.x += (animate == 1 ? sin(anim_rate * 0.001) * amplitude : amplitude) * sin(( texcoord.x * period * 10)  + (animate == 2 ?  anim_rate * 0.001 : phase));
+    else
+        texcoord.x += (animate == 1 ? sin(anim_rate * 0.001) * amplitude : amplitude) * sin(( texcoord.y * period * 10)  + (animate == 2 ?  anim_rate * 0.001 : phase));
     texcoord = float2(dot(texcoord, float2(_c,-_s)), dot(texcoord, float2(_s,_c)));
     texcoord += center;
 
