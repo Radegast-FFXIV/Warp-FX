@@ -1,63 +1,8 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* PBDistort Shader v3.0 - by Radegast Stravinsky of Ultros.                                               */
+/* PBDistort Shader v4.0 - by Radegast Stravinsky of Ultros.                                               */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
-uniform float radius <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_min = 0.0; ui_max = 1.0;
-> = 0.0;
-
-uniform float magnitude <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_min = -1.0; ui_max = 1.0;
-> = 0.0;
-
-uniform float tension <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_min = 0.; ui_max = 10.; ui_step = 0.001;
-> = 1.0;
-
-uniform float center_x <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_min = 0.0; ui_max = 1.0;
-> = 0.5;
-
-uniform float center_y <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else 
-        ui_type = "slider";
-    #endif
-    ui_min = 0.0; ui_max = 1.0;
-> = 0.5;
-
-
-uniform int animate <
-    ui_type = "combo";
-    ui_label = "Animate";
-    ui_items = "No\0Yes\0";
-    ui_tooltip = "Animates the Bulge/Pinch effect.";
-> = 0;
-
-uniform float anim_rate <
-    source = "timer";
->;
+#include "Include/BulgePinch.fxh"
 
 texture texColorBuffer : COLOR;
 texture texDepthBuffer : DEPTH;
@@ -66,7 +11,6 @@ texture pbDistortTarget
 {
     Width = BUFFER_WIDTH;
     Height = BUFFER_HEIGHT;
-    MipLevels = LINEAR;
     Format = RGBA8;
 };
 
@@ -95,12 +39,12 @@ sampler samplerDepth
     Texture = texDepthBuffer;
 };
 
-sampler samplerTarget
+sampler result 
 {
     Texture = pbDistortTarget;
 };
 
-//TODO: Learn what this vertex shader really does.
+// Vertex Shader
 void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
 {
     texcoord.x = (id == 2) ? 2.0 : 0.0;
@@ -111,14 +55,7 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
 
 }
 
-void PBDistortVS(uint id : SV_VertexId, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
-{
-    texcoord.x = radius;
-    texcoord.y = radius;
-
-    position = float4( texcoord * float2(2, -2) + float2(-1,1), 0, 1);
-}
-
+// Pixel Shaders (in order of appearance in the technique)
 void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
 {
     color = tex2D(samplerColor, texcoord);
@@ -126,17 +63,12 @@ void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out floa
 
 float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
-    float ar = BUFFER_WIDTH > BUFFER_HEIGHT ? (float)BUFFER_WIDTH/(float)BUFFER_HEIGHT : (float)BUFFER_HEIGHT/BUFFER_WIDTH;
+    float ar = 1. * BUFFER_HEIGHT/BUFFER_WIDTH;
     float2 center = float2(center_x, center_y);
-
-    if(BUFFER_WIDTH > BUFFER_HEIGHT)
-        texcoord.x *= ar;
-    else
-        texcoord.y *= ar;
     float2 tc = texcoord - center;
 
-    ;
-    
+    center.x /= ar;
+    tc.x /= ar;
 
     float dist = distance(tc, center);
     if (dist < radius)
@@ -150,26 +82,32 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
             tc = (tc-center) * lerp(1.0, pow(percent, 1.0 + anim_mag * 0.75) * radius/dist, 1.0 - percent);
 
         tc += (2*center);
+        tc.x *= ar;
 
-        if(BUFFER_WIDTH > BUFFER_HEIGHT)
-            tc.x /= ar;
-        else
-            tc.y /= ar;
+        return tex2D(samplerColor, tc);
+    }
+
         
-        return tex2D(samplerTarget, tc);
-    }
-    else
-    {
-        if(BUFFER_WIDTH > BUFFER_HEIGHT)
-            texcoord.x /= ar;
-        else
-            texcoord.y /= ar;
-        return tex2D(samplerTarget, texcoord);
-    }
+     return tex2D(samplerColor, texcoord);
         
 }
 
-technique BulgePinch
+float4 ResultPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
+{
+    float4 color = tex2D(result, texcoord);
+    float4 base = tex2D(samplerColor, texcoord);
+    
+    if(!additiveRender)
+        return color;
+
+    if(color.a == 0)
+        color.rgba = base.rgba;
+    
+        return color;
+}
+
+// Technique
+technique BulgePinch < ui_label="Bulge/Pinch";>
 {
     pass p0
     {
@@ -178,39 +116,19 @@ technique BulgePinch
         PixelShader = DoNothingPS;
 
         RenderTarget = pbDistortTarget;
-        ClearRenderTargets = true;
-
-        RenderTargetWriteMask = 0xF;
-
-        SRGBWriteEnable = false;
-
-        BlendEnable = false;
-
-        BlendOp = ADD;
-        BlendOpAlpha = ADD;
-
-        SrcBlend = ONE;
-        //SrcBlendAlpha = ONE;
-        DestBlend = ZERO;
-
-        StencilEnable = false;
-
-        StencilReadMask = 0xFF; // or StencilMask
-        StencilWriteMask = 0xFF;
-
-        StencilFunc = ALWAYS;
-
-        StencilRef = 0;
-
-        StencilPassOp = KEEP; 
-        StencilFailOp = KEEP; 
-        StencilDepthFailOp = KEEP; 
-
     }
 
     pass p1
     {
         VertexShader = FullScreenVS;
         PixelShader = PBDistort;
+    
+        RenderTarget = pbDistortTarget;
+    }
+
+    pass p2
+    {
+        VertexShader = FullScreenVS;
+        PixelShader = ResultPS;
     }
 };

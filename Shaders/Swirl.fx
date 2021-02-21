@@ -1,70 +1,8 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* Swirl Shader v3.0 - by Radegast Stravinsky of Ultros.                                               */
+/* Swirl Shader v4.0 - by Radegast Stravinsky of Ultros.                                               */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
-uniform float radius <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_min = 0.0; ui_max = 1.0;
-> = 0.0;
-
-uniform float angle <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_min = -1800.0; ui_max = 1800.0; ui_step = 1.0;
-> = 0.0;
-
-uniform float tension <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_min = 0.; ui_max = 10.; ui_step = 0.001;
-> = 1.0;
-
-uniform float center_x <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_min = 0.0; ui_max = 1.0;
-> = 0.5;
-
-uniform float center_y <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else 
-        ui_type = "slider";
-    #endif
-    ui_min = 0.0; ui_max = .5;
-> = 0.25;
-
-uniform int animate <
-    ui_type = "combo";
-    ui_label = "Animate";
-    ui_items = "No\0Yes\0";
-    ui_tooltip = "Animates the swirl, moving it clockwise and counterclockwise.";
-> = 0;
-
-uniform float anim_rate <
-    source = "timer";
->;
-
-uniform int inverse <
-    ui_type = "combo";
-    ui_label = "Inverse Angle";
-    ui_items = "No\0Yes\0";
-    ui_tooltip = "Inverts the angle of the swirl, making the edges the most distorted.";
-> = 0;
-
+#include "Include/Swirl.fxh"
 texture texColorBuffer : COLOR;
 texture texDepthBuffer : DEPTH;
 
@@ -72,33 +10,32 @@ texture swirlTarget
 {
     Width = BUFFER_WIDTH;
     Height = BUFFER_HEIGHT;
-    MipLevels = LINEAR;
-    Format = RGBA8;
+
+    
+    AddressU = WRAP;
+    AddressV = WRAP;
+    AddressW = WRAP;
+
+    Format = RGBA16;
 };
 
 sampler samplerColor
 {
     Texture = texColorBuffer;
-
+    
     AddressU = WRAP;
     AddressV = WRAP;
     AddressW = WRAP;
 
     Width = BUFFER_WIDTH;
     Height = BUFFER_HEIGHT;
-    MipLevels = LINEAR;
-    Format = RGBA8;
+    Format = RGBA16;
     
-    MagFilter = LINEAR;
-    MinFilter = LINEAR;
-    MipFilter = LINEAR;
+};
 
-    MinLOD = 0.0f;
-    MaxLOD = 1000.0f;
-
-    MipLODBias = 0.0f;
-
-    SRGBTexture = false;
+sampler result 
+{
+    Texture = swirlTarget;
 };
 
 sampler samplerDepth
@@ -106,12 +43,7 @@ sampler samplerDepth
     Texture = texDepthBuffer;
 };
 
-sampler samplerTarget
-{
-    Texture = swirlTarget;
-};
-
-//TODO: Learn what this vertex shader really does.
+// Vertex Shader
 void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
 {
     texcoord.x = (id == 2) ? 2.0 : 0.0;
@@ -120,6 +52,7 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
     position = float4( texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
 }
 
+// Pixel Shaders (in order of appearance in the technique)
 void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
 {
     color = tex2D(samplerColor, texcoord);
@@ -137,10 +70,10 @@ void Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 col
 
     float dist = distance(tc, center);
     
-    if (dist < radius)
+    if (dist < radius && pos.r)
     {
         float tension_radius = lerp(radius-dist, radius, tension);
-        float percent = (radius-dist)/tension_radius;
+        float percent = (radius-dist) /tension_radius;
         percent = inverse == 0 ? percent : 1 - percent;
         float theta = percent * percent * radians(angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
         float s =  sin(theta);
@@ -159,48 +92,44 @@ void Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 col
         
 }
 
-technique Swirl
+float4 ResultPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
+{
+    float4 color = tex2D(result, texcoord);
+    float4 base = tex2D(samplerColor, texcoord);
+    
+    if(!additiveRender)
+        return color;
+
+    if(color.a == 0)
+        color.rgba = base.rgba;
+    
+        return color;
+}
+
+// Technique
+technique Swirl< ui_label="Swirl";>
 {
     pass p0
     {
-       
         VertexShader = FullScreenVS;
         PixelShader = DoNothingPS;
 
         RenderTarget = swirlTarget;
-        ClearRenderTargets = true;
-
-        RenderTargetWriteMask = 0xF;
-
-        SRGBWriteEnable = false;
-
-        BlendEnable = false;
-
-        BlendOp = ADD;
-        BlendOpAlpha = ADD;
-
-        SrcBlend = ONE;
-        //SrcBlendAlpha = ONE;
-        DestBlend = ZERO;
-
-        StencilEnable = false;
-
-        StencilReadMask = 0xFF; // or StencilMask
-        StencilWriteMask = 0xFF;
-
-        StencilFunc = ALWAYS;
-
-        StencilRef = 0;
-
-        StencilPassOp = KEEP; 
-        StencilFailOp = KEEP; 
-        StencilDepthFailOp = KEEP; 
-
     }
 
     pass p1
     {
         VertexShader = FullScreenVS;
         PixelShader = Swirl;
+
+        RenderTarget = swirlTarget;
     }
+
+    pass p2
+    {
+        VertexShader = FullScreenVS;
+        PixelShader = ResultPS;
+    }
+
+
 };
