@@ -6,8 +6,8 @@ uniform float center_x <
     #else
         ui_type = "slider";
     #endif
-    ui_min = 0.0; ui_max = 100.0;
-> = 0.5;
+    ui_min = 0.0; ui_max = 360.0;
+> = 0;
 
 uniform float center_y <
     #if __RESHADE__ < 40000
@@ -15,8 +15,8 @@ uniform float center_y <
     #else 
         ui_type = "slider";
     #endif
-    ui_min = 0.0; ui_max = 100.0;
-> = 0.25;
+    ui_min = 0.0; ui_max = 360.0;
+> =0;
 
 uniform float offset_x <
     #if __RESHADE__ < 40000
@@ -25,7 +25,7 @@ uniform float offset_x <
         ui_type = "slider";
     #endif
     ui_min = 0.0; ui_max = 1.0;
-> = 0.5;
+> = 0;
 
 uniform float offset_y <
     #if __RESHADE__ < 40000
@@ -34,7 +34,7 @@ uniform float offset_y <
         ui_type = "slider";
     #endif
     ui_min = 0.0; ui_max = .5;
-> = 0.25;
+> = 0;
 
 uniform float scale <
     #if __RESHADE__ < 40000
@@ -43,7 +43,7 @@ uniform float scale <
         ui_type = "slider";
     #endif
     ui_min = 0.0; ui_max = 10.0;
-> = 0.5;
+> = 10.0;
 
 uniform float z_rotation <
     #if __RESHADE__ < 40000

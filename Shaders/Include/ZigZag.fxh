@@ -84,6 +84,6 @@ uniform float anim_rate <
 uniform int additiveRender <
     ui_type = "combo";
     ui_label = "Additively Render";
-    ui_items = "No\0Yes\0";
-    ui_tooltip = "Additively render the swirl.";
+    ui_items = "No\0Base -> Result\0Result -> Base\0";
+    ui_tooltip = "Additively render the effect.";
 > = 0;

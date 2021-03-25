@@ -36,6 +36,10 @@ sampler samplerColor
 sampler result 
 {
     Texture = swirlTarget;
+
+    Width = BUFFER_WIDTH;
+    Height = BUFFER_HEIGHT;
+    Format = RGBA16;
 };
 
 sampler samplerDepth
@@ -64,13 +68,12 @@ void Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 col
     float ar = 1. * BUFFER_HEIGHT/BUFFER_WIDTH;
     float2 center = float2(center_x, center_y);
     float2 tc = texcoord - center;
-
     center.x /= ar;
     tc.x /= ar;
 
     float dist = distance(tc, center);
     
-    if (dist < radius && pos.r)
+    if (dist < radius)
     {
         float tension_radius = lerp(radius-dist, radius, tension);
         float percent = (radius-dist) /tension_radius;
@@ -82,7 +85,7 @@ void Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 col
 
         tc += (2*center);
         tc.x *= ar;
-
+      
         color = tex2D(samplerColor, tc);
     }
     else
@@ -100,10 +103,7 @@ float4 ResultPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARG
     if(!additiveRender)
         return color;
 
-    if(color.a == 0)
-        color.rgba = base.rgba;
-    
-        return color;
+    return additiveRender == 1 ? lerp(base, color, color.a) : lerp(color, base, color.a);
 }
 
 // Technique

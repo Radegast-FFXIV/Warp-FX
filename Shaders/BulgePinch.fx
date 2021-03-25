@@ -100,10 +100,7 @@ float4 ResultPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARG
     if(!additiveRender)
         return color;
 
-    if(color.a == 0)
-        color.rgba = base.rgba;
-    
-        return color;
+    return additiveRender == 1 ? lerp(base, color, color.a) : lerp(color, base, color.a);
 }
 
 // Technique

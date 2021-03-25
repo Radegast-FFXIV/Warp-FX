@@ -32,7 +32,7 @@ uniform float center_x <
         ui_type = "slider";
     #endif
     ui_min = 0.0; ui_max = 1.0;
-> = 0.5;
+> = 0.25;
 
 uniform float center_y <
     #if __RESHADE__ < 40000
@@ -41,14 +41,14 @@ uniform float center_y <
         ui_type = "slider";
     #endif
     ui_min = 0.0; ui_max = 1.0;
-> = 0.5;
+> = 0.25;
 
 
 uniform int animate <
     ui_type = "combo";
     ui_label = "Animate";
     ui_items = "No\0Yes\0";
-    ui_tooltip = "Animates the Bulge/Pinch effect.";
+    ui_tooltip = "Animates the effect.";
 > = 0;
 
 uniform float anim_rate <
@@ -58,6 +58,6 @@ uniform float anim_rate <
 uniform int additiveRender <
     ui_type = "combo";
     ui_label = "Additively Render";
-    ui_items = "No\0Yes\0";
-    ui_tooltip = "Additively render the swirl.";
+    ui_items = "No\0Base -> Result\0Result -> Base\0";
+    ui_tooltip = "Additively render the effect.";
 > = 0;
