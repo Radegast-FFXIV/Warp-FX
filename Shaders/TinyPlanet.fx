@@ -1,9 +1,10 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* Tiny Planet Shader v1.0 - by Radegast Stravinsky of Ultros.                                         */
+/* Tiny Planet Shader v2.0 - by Radegast Stravinsky of Ultros.                                         */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 
 #include "Include/TinyPlanet.fxh"
+
 texture texColorBuffer : COLOR;
 texture texDepthBuffer : DEPTH;
 
@@ -67,9 +68,16 @@ sampler samplerTarget
 // Vertex Shaders
 void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
 {
-    texcoord.x = (id == 2) ? 2.0 : 0.0;
-    texcoord.y = (id == 1) ? 2.0 : 0.0;
-    
+    if (id == 2)
+        texcoord.x = 2.0;
+    else
+        texcoord.x = 0.0;
+
+    if (id == 1)
+        texcoord.y  = 2.0;
+    else
+        texcoord.y = 0.0;
+
     position = float4( texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
 }
 
@@ -81,27 +89,26 @@ void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out floa
 
 float4 TinyPlanet(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
-    float ar = 1.0f * (float)BUFFER_HEIGHT/(float)BUFFER_WIDTH;
+    const float ar = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
     
-    float3 rot = float3(center_x,center_y, z_rotation);
-    float3x3 t=getrot(rot);
+    const float3x3 rot = getrot(float3(center_x,center_y, z_rotation));
 
-    float2 rads = float2(PI*2.0 , PI);
-    float2 offset=float2(offset_x,offset_y);
-    float2 pnt = (texcoord - .5-offset).xy * float2(scale, scale*ar);
+    const float2 rads = float2(PI * 2.0 , PI);
+    const float2 offset=float2(offset_x, offset_y);
+    const float2 pnt = (texcoord - 0.5 - offset).xy * float2(scale, scale*ar);
 
     // Project to Sphere
-    float x2y2 = pnt.x * pnt.x + pnt.y * pnt.y;
-    float3 sphere_pnt = float3(2. * pnt, x2y2 - 1.0) / (x2y2 + 1.0);
+    const float x2y2 = pnt.x * pnt.x + pnt.y * pnt.y;
+    float3 sphere_pnt = float3(2.0 * pnt, x2y2 - 1.0) / (x2y2 + 1.0);
     
-    sphere_pnt = mul(sphere_pnt, t);
+    sphere_pnt = mul(sphere_pnt, rot);
 
     // Convert to Spherical Coordinates
-    float r = length(sphere_pnt);
-    float lon = atan2(sphere_pnt.y, sphere_pnt.x);
-    float lat = acos(sphere_pnt.z / r);
+    const float r = length(sphere_pnt);
+    const float lon = atan2(sphere_pnt.y, sphere_pnt.x);
+    const float lat = acos(sphere_pnt.z / r);
 
-    return tex2D(samplerTarget, float2(lon, lat)/rads);
+    return tex2D(samplerTarget, float2(lon, lat) / rads);
 }
 
 // Technique
