@@ -1,12 +1,11 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* PBDistort Shader v4.0 - by Radegast Stravinsky of Ultros.                                               */
+/* PBDistort Shader v5.0 - by Radegast Stravinsky of Ultros.                                               */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 #include "ReShade.fxh"
 #include "Include/BulgePinch.fxh"
 
 texture texColorBuffer : COLOR;
-texture texDepthBuffer : DEPTH;
 
 texture pbDistortTarget
 {
@@ -33,11 +32,6 @@ sampler samplerColor
     MipLODBias = 0.0f;
 
     SRGBTexture = false;
-};
-
-sampler samplerDepth
-{
-    Texture = texDepthBuffer;
 };
 
 sampler result 

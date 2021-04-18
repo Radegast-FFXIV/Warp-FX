@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* Wave Shader v3.0 - by Radegast Stravinsky of Ultros.                                                */
+/* Wave Shader v4.0 - by Radegast Stravinsky of Ultros.                                                */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 #include "Include/Wave.fxh"
