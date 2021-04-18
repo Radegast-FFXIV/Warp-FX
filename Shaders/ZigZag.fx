@@ -3,9 +3,9 @@
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 #include "Include/ZigZag.fxh"
+#include "ReShade.fxh"
 
 texture texColorBuffer : COLOR;
-texture texDepthBuffer : DEPTH;
 
 texture zzTarget
 {
@@ -23,16 +23,6 @@ sampler samplerColor
     AddressV = WRAP;
     AddressW = WRAP;
 
-};
-
-sampler samplerDepth
-{
-    Texture = texDepthBuffer;
-};
-
-sampler result
-{
-    Texture = zzTarget;
 };
 
 // Vertex Shader
@@ -59,8 +49,12 @@ void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out floa
 
 float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
-    const float ar = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
-    float2 center = float2(center_x, center_y);
+    const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
+    const float depth = ReShade::GetLinearizedDepth(texcoord).r;
+    float4 color;
+    const float4 base = tex2D(samplerColor, texcoord);
+    float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
+    float2 center = coordinates;
     float2 tc = texcoord - center;
 
     center.x /= ar;
@@ -68,7 +62,7 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 
 
     const float dist = distance(tc, center);
-    if (dist < radius)
+    if (dist < radius && depth >= min_depth)
     {
         const float tension_radius = lerp(radius-dist, radius, tension);
         const float percent = (radius-dist) / tension_radius;
@@ -82,26 +76,30 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         tc += (2.0 * center);
         tc.x *= ar;
 
-        return tex2D(samplerColor, tc);
+        color = tex2D(samplerColor, tc);
     }
-
-    return tex2D(samplerColor, texcoord);
-   
-}
-
-float4 ResultPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
-{
-    const float4 color = tex2D(result, texcoord);
-    
-    switch(additiveRender)
+    else
     {
-        case 0:
-            return color;
-        case 1:
-            return lerp(tex2D(samplerColor, texcoord), color, color.a);
-        default:
-            return lerp(color, tex2D(samplerColor, texcoord), color.a);
+        color = tex2D(samplerColor, texcoord);
     }
+    if(depth >= min_depth)
+        switch(render_type)
+        {
+            case 1:
+                color += base;
+                break;
+            case 2:
+                color *= base;
+                break;
+            case 3:
+                color -= base;
+                break;
+            case 4:
+                color /= base;
+                break;
+        }  
+    
+    return color;
 }
 
 // Technique
@@ -109,7 +107,6 @@ technique ZigZag
 {
     pass p0
     {
-       
         VertexShader = FullScreenVS;
         PixelShader = DoNothingPS;
 
@@ -120,13 +117,6 @@ technique ZigZag
     {
         VertexShader = FullScreenVS;
         PixelShader = ZigZag;
-
-        RenderTarget = zzTarget;
     }
 
-    pass p2 
-    {
-        VertexShader = FullScreenVS;
-        PixelShader = ResultPS;
-    }
 };

@@ -3,9 +3,9 @@
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 #include "Include/Swirl.fxh"
+#include "ReShade.fxh"
 
 texture texColorBuffer : COLOR;
-texture texDepthBuffer : DEPTH;
 
 texture swirlTarget
 {
@@ -34,20 +34,6 @@ sampler samplerColor
     
 };
 
-sampler result 
-{
-    Texture = swirlTarget;
-
-    Width = BUFFER_WIDTH;
-    Height = BUFFER_HEIGHT;
-    Format = RGBA16;
-};
-
-sampler samplerDepth
-{
-    Texture = texDepthBuffer;
-};
-
 // Vertex Shader
 void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
 {
@@ -70,19 +56,21 @@ void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out floa
     color = tex2D(samplerColor, texcoord);
 }
 
-void Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
+float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
-    
-    const float ar = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
-    float2 center = float2(center_x, center_y);
+    const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
+    float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
+    const float4 base = tex2D(samplerColor, texcoord);
+    const float depth = ReShade::GetLinearizedDepth(texcoord).r;
+    float2 center = coordinates;
     float2 tc = texcoord - center;
+    float4 color;
 
     center.x /= ar;
     tc.x /= ar;
 
     const float dist = distance(tc, center);
-    
-    if (dist < radius)
+    if (dist < radius && depth >= min_depth)
     {
         const float tension_radius = lerp(radius-dist, radius, tension);
         float percent = (radius-dist) / tension_radius;
@@ -96,29 +84,35 @@ void Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 col
         tc += (2 * center);
         tc.x *= ar;
       
+      
         color = tex2D(samplerColor, tc);
     }
     else
     {
         color = tex2D(samplerColor, texcoord);
     }
-        
+
+    if(depth >= min_depth)
+        switch(render_type)
+        {
+            case 1:
+                color += base;
+                break;
+            case 2:
+                color *= base;
+                break;
+            case 3:
+                color -= base;
+                break;
+            case 4:
+                color /= base;
+                break;
+        }  
+
+    return color;
+   
 }
 
-float4 ResultPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
-{
-    const float4 color = tex2D(result, texcoord);
-    
-    switch(additiveRender)
-    {
-        case 0:
-            return color;
-        case 1:
-            return lerp(tex2D(samplerColor, texcoord), color, color.a);
-        default:
-            return lerp(color, tex2D(samplerColor, texcoord), color.a);
-    }
-}
 
 // Technique
 technique Swirl< ui_label="Swirl";>
@@ -135,15 +129,6 @@ technique Swirl< ui_label="Swirl";>
     {
         VertexShader = FullScreenVS;
         PixelShader = Swirl;
-
-        RenderTarget = swirlTarget;
     }
-
-    pass p2
-    {
-        VertexShader = FullScreenVS;
-        PixelShader = ResultPS;
-    }
-
 
 };

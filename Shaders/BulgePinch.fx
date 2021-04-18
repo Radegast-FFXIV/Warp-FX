@@ -2,6 +2,7 @@
 /* PBDistort Shader v4.0 - by Radegast Stravinsky of Ultros.                                               */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
+#include "ReShade.fxh"
 #include "Include/BulgePinch.fxh"
 
 texture texColorBuffer : COLOR;
@@ -63,15 +64,21 @@ void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out floa
 
 float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
-    float ar = 1. * BUFFER_HEIGHT/BUFFER_WIDTH;
-    float2 center = float2(center_x, center_y);
+    const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
+    float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
+
+    float2 center = coordinates;
     float2 tc = texcoord - center;
+
+    float4 color;
+    const float4 base = tex2D(samplerColor, texcoord);
+    const float depth = ReShade::GetLinearizedDepth(texcoord).r;
 
     center.x /= ar;
     tc.x /= ar;
 
     float dist = distance(tc, center);
-    if (dist < radius)
+    if (dist < radius && depth >= min_depth)
     {
         float anim_mag = (animate == 1 ? magnitude * sin(radians(anim_rate * 0.05)) : magnitude);
         float tension_radius = lerp(dist, radius, tension);
@@ -84,23 +91,30 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
         tc += (2*center);
         tc.x *= ar;
 
-        return tex2D(samplerColor, tc);
+        color = tex2D(samplerColor, tc);
+    }
+    else {
+        color = tex2D(samplerColor, texcoord);
     }
 
-        
-     return tex2D(samplerColor, texcoord);
-        
-}
+    if(depth >= min_depth)
+        switch(render_type)
+        {
+            case 1:
+                color += base;
+                break;
+            case 2:
+                color *= base;
+                break;
+            case 3:
+                color -= base;
+                break;
+            case 4:
+                color /= base;
+                break;
+        }  
 
-float4 ResultPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
-{
-    float4 color = tex2D(result, texcoord);
-    float4 base = tex2D(samplerColor, texcoord);
-    
-    if(!additiveRender)
-        return color;
-
-    return additiveRender == 1 ? lerp(base, color, color.a) : lerp(color, base, color.a);
+    return color;
 }
 
 // Technique
@@ -119,13 +133,5 @@ technique BulgePinch < ui_label="Bulge/Pinch";>
     {
         VertexShader = FullScreenVS;
         PixelShader = PBDistort;
-    
-        RenderTarget = pbDistortTarget;
-    }
-
-    pass p2
-    {
-        VertexShader = FullScreenVS;
-        PixelShader = ResultPS;
     }
 };
