@@ -21,7 +21,7 @@ uniform float period <
         ui_type = "slider";
     #endif
     ui_min = 0.1; ui_max = 10.0;
-    ui_tooltip = "The wavelength of the distortion. Smaller values make for a longer wavelength.";
+    ui_tooltip = "The wavelength of the distortion. Smaller values make for a\nlonger wavelength.";
 > = 0.5;
 
 uniform float amplitude <
@@ -59,7 +59,7 @@ uniform int animate <
     ui_type = "combo";
     ui_label = "Animate";
     ui_items = "No\0Amplitude\0Phase\0Angle\0";
-    ui_tooltip = "Enable or disable the animation. Animates the wave effect by phase, amplitude, or angle.";
+    ui_tooltip = "Enable or disable the animation. Animates the wave effect by phase,\namplitude, or angle.";
 > = 0;
 
 uniform float anim_rate <

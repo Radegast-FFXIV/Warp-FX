@@ -4,7 +4,6 @@ uniform float radius <
     #else
         ui_type = "slider";
     #endif
-    ui_category="Swirl Properties";
     ui_label="Radius";
     ui_min = 0.0; 
     ui_max = 1.0;
@@ -16,7 +15,6 @@ uniform float angle <
     #else
         ui_type = "slider";
     #endif
-    ui_category="Swirl Properties";
     ui_label="Angle";
     ui_min = -1800.0; 
     ui_max = 1800.0; 
@@ -29,7 +27,6 @@ uniform float tension <
     #else
         ui_type = "slider";
     #endif
-    ui_category="Swirl Properties";
     ui_label="Tension";
     ui_tooltip="Determines how rapidly the swirl reaches the maximum angle.";
     ui_min = 0.; 
@@ -55,7 +52,6 @@ uniform float aspect_ratio <
     #else 
         ui_type = "slider";
     #endif
-    ui_category="Swirl Properties";
     ui_label="Aspect Ratio"; 
     ui_min = -100.0; 
     ui_max = 100.0;
@@ -67,7 +63,6 @@ uniform float min_depth <
     #else 
         ui_type = "slider";
     #endif
-    ui_category="Swirl Properties";
     ui_label="Minimum Depth";
     ui_min=0.0;
     ui_max=1.0;
@@ -75,7 +70,6 @@ uniform float min_depth <
 
 uniform int animate <
     ui_type = "combo";
-    ui_category="Swirl Properties";
     ui_label = "Animate";
     ui_items = "No\0Yes\0";
     ui_tooltip = "Animates the swirl, moving it clockwise and counterclockwise.";
@@ -87,7 +81,6 @@ uniform float anim_rate <
 
 uniform int inverse <
     ui_type = "combo";
-    ui_category="Swirl Properties";
     ui_label = "Inverse Angle";
     ui_items = "No\0Yes\0";
     ui_tooltip = "Inverts the angle of the swirl, making the edges the most distorted.";
