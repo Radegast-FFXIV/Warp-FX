@@ -107,6 +107,14 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
             case 4:
                 color /= base;
                 break;
+            case 5:
+                if(length(color.rgb) > length(base.rgb))
+                    color = base;
+                break;
+            case 6:
+                if(length(color.rgb) < length(base.rgb))
+                    color = base;
+                break;
         }  
 
     return color;

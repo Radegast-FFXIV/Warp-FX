@@ -89,6 +89,6 @@ uniform int inverse <
 uniform int render_type <
     ui_type = "combo";
     ui_label = "Blending Mode";
-    ui_items = "Normal\0Add\0Multiply\0Subtract\0Divide\0";
+    ui_items = "Normal\0Add\0Multiply\0Subtract\0Divide\0Darker\0Lighter\0";
     ui_tooltip = "Choose a blending mode.";
 > = 0;
