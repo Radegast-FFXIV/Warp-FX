@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* ZigZag Shader v5.0 - by Radegast Stravinsky of Ultros.                                               */
+/* ZigZag Shader v6.0 - by Radegast Stravinsky of Ultros.                                               */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 #include "Include/ZigZag.fxh"
@@ -42,11 +42,6 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
 }
 
 // Pixel Shaders (in order of appearance in the technique)
-void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
-{
-    color = tex2D(samplerColor, texcoord);
-}
-
 float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
     const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
@@ -114,14 +109,6 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 technique ZigZag
 {
     pass p0
-    {
-        VertexShader = FullScreenVS;
-        PixelShader = DoNothingPS;
-
-        RenderTarget = zzTarget;
-    }
-
-    pass p1
     {
         VertexShader = FullScreenVS;
         PixelShader = ZigZag;

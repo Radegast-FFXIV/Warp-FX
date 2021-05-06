@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* Swirl Shader v6.0 - by Radegast Stravinsky of Ultros.                                               */
+/* Swirl Shader v7.0 - by Radegast Stravinsky of Ultros.                                               */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 #include "Include/Swirl.fxh"
@@ -51,16 +51,11 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
 }
 
 // Pixel Shaders (in order of appearance in the technique)
-void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
-{
-    color = tex2D(samplerColor, texcoord);
-}
-
 float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
+    float4 base = tex2D(samplerColor, texcoord);
     const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
-    const float4 base = tex2D(samplerColor, texcoord);
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
     float2 center = coordinates;
     float2 tc = texcoord - center;
@@ -89,7 +84,7 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     }
     else
     {
-        color = tex2D(samplerColor, texcoord);
+        color = base;
     }
 
     if(depth >= min_depth)
@@ -128,15 +123,6 @@ technique Swirl< ui_label="Swirl";>
     pass p0
     {
         VertexShader = FullScreenVS;
-        PixelShader = DoNothingPS;
-
-        RenderTarget = swirlTarget;
-    }
-
-    pass p1
-    {
-        VertexShader = FullScreenVS;
         PixelShader = Swirl;
     }
-
 };

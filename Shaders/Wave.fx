@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* Wave Shader v4.0 - by Radegast Stravinsky of Ultros.                                                */
+/* Wave Shader v5.0 - by Radegast Stravinsky of Ultros.                                                */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 #include "Include/Wave.fxh"
@@ -52,14 +52,8 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
 
 }
 
-void DoNothingPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
-{
-    color = tex2D(samplerColor, texcoord);
-}
-
 float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET 
 {
-    
     const float ar = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
     const float2 center = float2(0.5 / ar, 0.5);
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
@@ -148,15 +142,6 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 technique Wave
 {
     pass p0
-    {
-       
-        VertexShader = FullScreenVS;
-        PixelShader = DoNothingPS;
-
-        RenderTarget = waveTarget;
-    }
-
-    pass p1
     {
         VertexShader = FullScreenVS;
         PixelShader = Wave;
