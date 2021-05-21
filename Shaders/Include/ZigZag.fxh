@@ -5,7 +5,7 @@ uniform float radius <
         ui_type = "slider";
     #endif
     ui_min = 0.0; ui_max = 1.0;
-> = 0.0;
+> = 0.5;
 
 uniform float angle <
     #if __RESHADE__ < 40000
@@ -13,6 +13,7 @@ uniform float angle <
     #else
         ui_type = "slider";
     #endif
+    ui_tooltip = "Adjusts the ripple angle. Positive and negative values affect the animation direction."
     ui_min = -999.0; ui_max = 999.0; ui_step = 1.0;
 > = 180.0;
 
@@ -23,7 +24,7 @@ uniform float period <
         ui_type = "slider";
     #endif
     ui_min = 0.1; ui_max = 10.0;
-> = 0.5;
+> = 0.25;
 
 uniform float amplitude <
     #if __RESHADE__ < 40000
@@ -32,7 +33,7 @@ uniform float amplitude <
         ui_type = "slider";
     #endif
     ui_min = -10.0; ui_max = 10.0;
-> = 0.0;
+> = 3.0;
 
 uniform float2 coordinates <
     #if __RESHADE__ < 40000
