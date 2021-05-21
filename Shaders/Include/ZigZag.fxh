@@ -13,7 +13,7 @@ uniform float angle <
     #else
         ui_type = "slider";
     #endif
-    ui_tooltip = "Adjusts the ripple angle. Positive and negative values affect the animation direction."
+    ui_tooltip = "Adjusts the ripple angle. Positive and negative values affect the animation direction.";
     ui_min = -999.0; ui_max = 999.0; ui_step = 1.0;
 > = 180.0;
 
