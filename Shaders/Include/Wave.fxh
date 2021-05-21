@@ -12,7 +12,7 @@ uniform float angle <
         ui_type = "slider";
     #endif
     ui_min = -360.0; ui_max = 360.0; ui_step = 1.0;
-> = 180.0;
+> = 0.0;
 
 uniform float period <
     #if __RESHADE__ < 40000
@@ -22,7 +22,7 @@ uniform float period <
     #endif
     ui_min = 0.1; ui_max = 10.0;
     ui_tooltip = "The wavelength of the distortion. Smaller values make for a\nlonger wavelength.";
-> = 0.5;
+> = 3.0;
 
 uniform float amplitude <
     #if __RESHADE__ < 40000
@@ -32,7 +32,7 @@ uniform float amplitude <
     #endif
     ui_min = -1.0; ui_max = 1.0;
     ui_tooltip = "The amplitude of the distortion in each direction.";
-> = 0.0;
+> = 0.075;
 
 uniform float phase <
     #if __RESHADE__ < 40000
@@ -41,7 +41,7 @@ uniform float phase <
         ui_type = "slider";
     #endif
     ui_min = -5.0; ui_max = 5.0;
-    ui_tooltip = "The offset being applied to the distortion's waves. Smaller is longer.";
+    ui_tooltip = "The offset being applied to the distortion's waves.";
 > = 0.0;
 
 uniform float min_depth <
