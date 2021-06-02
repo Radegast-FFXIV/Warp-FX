@@ -60,7 +60,7 @@ uniform float seam_scale <
     ui_max = 1.0;
     ui_label = "Seam Blending";
     ui_tooltip = "Blends the ends of the screen so that the seam is somewhat reasonably hidden.";
-> = 1.0;
+> = 0.5;
 
 float3x3 getrot(float3 r)
 {
