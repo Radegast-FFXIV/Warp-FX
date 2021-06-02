@@ -54,6 +54,13 @@ uniform float z_rotation <
     ui_min = 0.0; ui_max = 360.0;
 > = 0.5;
 
+uniform float seam_scale <
+    ui_type = "slider";
+    ui_min = 0.5;
+    ui_max = 1.0;
+    ui_label = "Seam Blending";
+    ui_tooltip = "Blends the ends of the screen so that the seam is somewhat reasonably hidden.";
+> = 1.0;
 
 float3x3 getrot(float3 r)
 {

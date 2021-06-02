@@ -56,6 +56,19 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
 }
 
 // Pixel Shaders (in order of appearance in the technique)
+float4 PreTP(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
+{
+    const float inv_seam = 1 - seam_scale;
+    float4 tc1 =  tex2D(samplerColor, texcoord + float2(inv_seam, 0.0));
+    float4 tc = tex2D(samplerColor, texcoord * float2(seam_scale, 1.0));
+    
+    if(texcoord.x < inv_seam){ 
+        tc.rgb = lerp(tc1.rgb, tc.rgb, 1- clamp((inv_seam-texcoord.x) * 10., 0, 1));
+    }
+    if(texcoord.x > seam_scale) tc.rgb = lerp(tc.rgb, tc1.rgb, clamp((texcoord.x-seam_scale) * 10., 0, 1));
+    return tc;
+}
+
 float4 TinyPlanet(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
     const float ar = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
@@ -83,7 +96,12 @@ float4 TinyPlanet(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TA
 // Technique
 technique TinyPlanet
 {
-    pass p0
+     pass p0
+    {
+        VertexShader = FullScreenVS;
+        PixelShader = PreTP;
+    }
+    pass p1
     {
         VertexShader = FullScreenVS;
         PixelShader = TinyPlanet;
