@@ -49,7 +49,7 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     float4 color;
     const float4 base = tex2D(samplerColor, texcoord);
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
-    
+
     float2 center = coordinates;
     if (use_mouse_point) 
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
@@ -60,11 +60,11 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     tc.x /= ar;
 
 
-    const float dist = distance(tc, center);
-    if (dist < radius && depth >= min_depth)
+    if (depth >= min_depth)
     {
+        const float dist = distance(tc, center);
         const float tension_radius = lerp(radius-dist, radius, tension);
-        const float percent = (radius-dist) / tension_radius;
+        const float percent = max(radius-dist, 0) / tension_radius;
         
         const float theta = percent * percent * (animate == 1 ? amplitude * sin(anim_rate * 0.0005) : amplitude) * sin(percent * percent / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate : 0)));
         tc = mul(swirlTransform(theta), tc-center);
