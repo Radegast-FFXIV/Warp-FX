@@ -2,8 +2,8 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
-I really should've done this when I first started, but I'll fill it out soon.
-
+## v1.0.0 (Baseline)
+- Baseline release for already released shaders. This should provide more stability to end-users.
 # Shaders
 This list of shaders will grow as I figure out more ways of exploding peoples screens into some interesting effects. 
 ### Swirl
