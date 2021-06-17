@@ -1,3 +1,5 @@
+#include "Include/RadegastShaders.BlendingModes.fxh"
+
 uniform int wave_type <
     ui_type = "combo";
     ui_label = "Wave Type";

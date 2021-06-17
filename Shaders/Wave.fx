@@ -112,29 +112,7 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         color = tex2D(samplerColor, texcoord);
     }
     if(depth >= min_depth)
-        switch(render_type)
-        {
-            case 1: // Add
-                color += base;
-                break;
-            case 2: // Multiply
-                color *= base;
-                break;
-            case 3: // Subtract
-                color -= base;
-                break;
-            case 4: // Divide
-                color /= base;
-                break;
-            case 5: // Darker
-                if(length(color.rgb) > length(base.rgb))
-                    color = base;
-                break;
-            case 6: // Lighter
-                if(length(color.rgb) < length(base.rgb))
-                    color = base;
-                break;
-        }
+        color = applyBlendingMode(base, color);
 
     return color;
 }
