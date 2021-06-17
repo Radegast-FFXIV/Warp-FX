@@ -58,6 +58,10 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
     float2 center = coordinates;
+
+    if (use_mouse_point) 
+        center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
+
     float2 tc = texcoord - center;
     float4 color;
 
@@ -65,20 +69,18 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     tc.x /= ar;
 
     const float dist = distance(tc, center);
-    if (dist < radius && depth >= min_depth)
+    if (depth >= min_depth)
     {
+        const float dist_radius = radius-dist;
         const float tension_radius = lerp(radius-dist, radius, tension);
-        float percent = (radius-dist) / tension_radius;
-        if (inverse != 0)
-            percent = 1 - percent;
+        float percent = max(dist_radius, 0) / tension_radius;   
+        if(inverse && dist < radius)
+            percent = 1 - percent;     
         const float theta = percent * percent * radians(angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
-        const float s =  sin(theta);
-        const float c =  cos(theta);
-        tc = float2(dot(tc - center, float2(c, -s)), dot(tc - center, float2(s,c)));
 
+        tc = mul(swirlTransform(theta), tc-center);
         tc += (2 * center);
-        tc.x *= ar;
-      
+        tc.x *= ar;    
       
         color = tex2D(samplerColor, tc);
     }
@@ -88,29 +90,7 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     }
 
     if(depth >= min_depth)
-        switch(render_type)
-        {
-            case 1:
-                color += base;
-                break;
-            case 2:
-                color *= base;
-                break;
-            case 3:
-                color -= base;
-                break;
-            case 4:
-                color /= base;
-                break;
-            case 5:
-                if(length(color.rgb) > length(base.rgb))
-                    color = base;
-                break;
-            case 6:
-                if(length(color.rgb) < length(base.rgb))
-                    color = base;
-                break;
-        }  
+        color = applyBlendingMode(base, color);
 
     return color;
    

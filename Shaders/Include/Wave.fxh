@@ -65,11 +65,3 @@ uniform int animate <
 uniform float anim_rate <
     source = "timer";
 >;
-
-
-uniform int render_type <
-    ui_type = "combo";
-    ui_label = "Render Type";
-    ui_items = "Normal\0Add\0Multiply\0Subtract\0Divide\0Darker\0Lighter\0";
-    ui_tooltip = "Additively render the effect.";
-> = 0;

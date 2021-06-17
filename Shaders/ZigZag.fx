@@ -49,7 +49,11 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     float4 color;
     const float4 base = tex2D(samplerColor, texcoord);
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
+    
     float2 center = coordinates;
+    if (use_mouse_point) 
+        center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
+
     float2 tc = texcoord - center;
 
     center.x /= ar;
@@ -63,10 +67,7 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         const float percent = (radius-dist) / tension_radius;
         
         const float theta = percent * percent * (animate == 1 ? amplitude * sin(anim_rate * 0.0005) : amplitude) * sin(percent * percent / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate : 0)));
-
-        const float s =  sin(theta);
-        const float c = cos(theta);
-        tc = float2(dot(tc - center, float2(c, -s)), dot(tc - center, float2(s, c)));
+        tc = mul(swirlTransform(theta), tc-center);
 
         tc += (2.0 * center);
         tc.x *= ar;
@@ -78,29 +79,7 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         color = tex2D(samplerColor, texcoord);
     }
     if(depth >= min_depth)
-        switch(render_type)
-        {
-            case 1:
-                color += base;
-                break;
-            case 2:
-                color *= base;
-                break;
-            case 3:
-                color -= base;
-                break;
-            case 4:
-                color /= base;
-                break;
-            case 5:
-                if(length(color.rgb) > length(base.rgb))
-                    color = base;
-                break;
-            case 6:
-                if(length(color.rgb) < length(base.rgb))
-                    color = base;
-                break;
-        }  
+       applyBlendingMode(base, color);
     
     return color;
 }
