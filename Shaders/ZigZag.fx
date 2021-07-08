@@ -2,8 +2,8 @@
 /* ZigZag Shader - by Radegast Stravinsky of Ultros.                                               */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
-#include "Include/ZigZag.fxh"
 #include "ReShade.fxh"
+#include "Include/ZigZag.fxh"
 
 texture texColorBuffer : COLOR;
 
@@ -65,9 +65,17 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         const float dist = distance(tc, center);
         const float tension_radius = lerp(radius-dist, radius, tension);
         const float percent = max(radius-dist, 0) / tension_radius;
+        const float percentSquared = percent * percent;
+        const float theta = percentSquared * (animate == 1 ? amplitude * sin(anim_rate * 0.0005) : amplitude) * sin(percentSquared / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate : 0)));
         
-        const float theta = percent * percent * (animate == 1 ? amplitude * sin(anim_rate * 0.0005) : amplitude) * sin(percent * percent / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate : 0)));
-        tc = mul(swirlTransform(theta), tc-center);
+        if(!mode)
+        {
+            tc = mul(swirlTransform(theta), tc-center);
+        }
+        else
+        {
+            tc = mul(zigzagTransform(theta), tc-center);
+        }
 
         tc += (2.0 * center);
         tc.x *= ar;

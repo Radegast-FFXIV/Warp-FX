@@ -2,6 +2,13 @@
 #include "Include/RadegastShaders.BlendingModes.fxh"
 #include "Include/RadegastShaders.Transforms.fxh"
 
+uniform int mode <
+    ui_type = "combo";
+    ui_label = "Mode";
+    ui_items = "Around center\0Out from center\0";
+    ui_tooltip = "Selects the mode the distortion should be processed through.";
+> = 0;
+
 uniform float angle <
     #if __RESHADE__ < 40000
         ui_type = "drag";

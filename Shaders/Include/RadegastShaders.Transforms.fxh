@@ -13,6 +13,14 @@ float2x2 swirlTransform(float theta) {
     );
 };
 
+float2x2 zigzagTransform(float theta) {
+    const float c = cos(theta);
+    return float2x2(
+        c, 0,
+        0, c
+    );
+}
+
 float3x3 getrot(float3 r)
 {
     const float cx = cos(radians(r.x));
