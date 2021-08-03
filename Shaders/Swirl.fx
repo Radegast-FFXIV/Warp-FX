@@ -7,26 +7,13 @@
 
 texture texColorBuffer : COLOR;
 
-texture swirlTarget
-{
-    Width = BUFFER_WIDTH;
-    Height = BUFFER_HEIGHT;
-
-    
-    AddressU = WRAP;
-    AddressV = WRAP;
-    AddressW = WRAP;
-
-    Format = RGBA16;
-};
-
 sampler samplerColor
 {
     Texture = texColorBuffer;
     
-    AddressU = WRAP;
-    AddressV = WRAP;
-    AddressW = WRAP;
+    AddressU = MIRROR;
+    AddressV = MIRROR;
+    AddressW = MIRROR;
 
     Width = BUFFER_WIDTH;
     Height = BUFFER_HEIGHT;
