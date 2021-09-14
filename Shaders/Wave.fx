@@ -106,13 +106,12 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         tc.x *= ar;
 
         color = tex2D(samplerColor, tc);
+        color = applyBlendingMode(base, color);
     }
     else
     {
         color = tex2D(samplerColor, texcoord);
     }
-    if(depth >= min_depth)
-        color = applyBlendingMode(base, color);
 
     return color;
 }

@@ -50,7 +50,7 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     const float4 base = tex2D(samplerColor, texcoord);
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
 
-    float2 center = coordinates;
+    float2 center = coordinates / 2.0;
     if (use_mouse_point) 
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
 
@@ -81,13 +81,12 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         tc.x *= ar;
 
         color = tex2D(samplerColor, tc);
+        color = applyBlendingMode(base, color, percentSquared);
     }
     else
     {
         color = tex2D(samplerColor, texcoord);
     }
-    if(depth >= min_depth)
-       applyBlendingMode(base, color);
     
     return color;
 }

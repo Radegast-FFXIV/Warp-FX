@@ -44,7 +44,7 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
-    float2 center = coordinates;
+    float2 center = coordinates  / 2.0;
 
     if (use_mouse_point) 
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
@@ -89,14 +89,14 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         tc.x *= ar;    
       
         color = tex2D(samplerColor, tc);
+        color = applyBlendingMode(base, color, percent * percent);
     }
     else
     {
         color = base;
     }
 
-    if(depth >= min_depth)
-        color = applyBlendingMode(base, color);
+    
 
     return color;
    

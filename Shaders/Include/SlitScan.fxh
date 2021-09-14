@@ -4,7 +4,8 @@ uniform float x_col <
     #else
         ui_type = "slider";
     #endif
-    ui_label="X";
+    ui_label = "Position";
+    ui_tooltip = "The position on the screen to start scanning. (Does not work with Animate enabled.)"; 
     ui_max = 1.0;
     ui_min = 0.0;
 > = 0.250;
@@ -22,10 +23,6 @@ uniform float scan_speed <
     ui_min = 0.0;
 > = 1.0;
 
-uniform float anim_rate <
-    source = "framecount";
->;
-
 uniform float min_depth <
     #if __RESHADE__ < 40000
         ui_type = "drag";
@@ -37,3 +34,29 @@ uniform float min_depth <
     ui_min=0.0;
     ui_max=1.0;
 > = 0;
+
+uniform int direction <
+    ui_type = "combo";
+    ui_label = "Scan Direction";
+    ui_items = "Left\0Right\0Up\0Down\0";
+    ui_tooltip = "Changes the direction of the scan to the direction specified.";
+> = 0;
+
+uniform int animate <
+    ui_type = "combo";
+    ui_label = "Animate";
+    ui_items = "No\0Yes\0";
+    ui_tooltip = "Animates the scanned column, moving it from one end to the other.";
+> = 0;
+
+uniform float frame_rate <
+    source = "framecount";
+>;
+
+uniform float2 anim_rate <
+    source = "pingpong";
+    min = 0.0;
+    max = 1.0;
+    step = 0.001;
+    smoothing = 0.0;
+>;
