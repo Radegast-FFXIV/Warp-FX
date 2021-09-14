@@ -9,7 +9,11 @@ uniform int wave_type <
 > = 1;
 
 uniform float angle <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_label = "Angle";
     ui_tooltip = "The angle at which the distortion occurs.";
     ui_min = -360.0; 
@@ -18,7 +22,11 @@ uniform float angle <
 > = 0.0;
 
 uniform float period <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_label = "Phase";
     ui_min = 0.1; 
     ui_max = 10.0;
@@ -26,7 +34,11 @@ uniform float period <
 > = 3.0;
 
 uniform float amplitude <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_label = "Amplitude";
     ui_min = -1.0; 
     ui_max = 1.0;
@@ -34,7 +46,11 @@ uniform float amplitude <
 > = 0.075;
 
 uniform float phase <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_label = "Phase";
     ui_min = -5.0; 
     ui_max = 5.0;
@@ -42,7 +58,11 @@ uniform float phase <
 > = 0.0;
 
 uniform float min_depth <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_label="Minimum Depth";
     ui_min=0.0;
     ui_max=1.0;

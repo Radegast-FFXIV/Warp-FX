@@ -10,7 +10,11 @@ uniform int mode <
 > = 0;
 
 uniform float angle <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_label = "Angle";
     ui_tooltip = "Serves as a multiplier for the phase and amplitude. Also affects the motion of the animation by phase based on whether the value is negative or positive.";
     ui_tooltip = "Adjusts the ripple angle. Positive and negative values affect the animation direction.";
@@ -20,7 +24,11 @@ uniform float angle <
 > = 180.0;
 
 uniform float period <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_type = "Phase";
     ui_tooltip = "Adjusts the rate of distortion.";
     ui_min = 0.1; 
@@ -28,7 +36,11 @@ uniform float period <
 > = 0.25;
 
 uniform float amplitude <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_label = "Amplitude";
     ui_tooltip = "Increases how extreme the picture twists back and forth.";
     ui_min = -10.0; 
@@ -36,7 +48,11 @@ uniform float amplitude <
 > = 3.0;
 
 uniform float phase <
-    ui_type = "slider";
+    #if __RESHADE__ < 40000
+        ui_type = "drag";
+    #else
+        ui_type = "slider";
+    #endif
     ui_label = "Phase";
     ui_tooltip = "The offset at which the pixels twist back and forth from the center.";
     ui_min = -5.0; 
