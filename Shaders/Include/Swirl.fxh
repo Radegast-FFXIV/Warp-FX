@@ -10,7 +10,7 @@ uniform int swirl_mode <
 > = 0;
 
 uniform float inner_radius <
-        #if __RESHADE__ < 40000
+    #if __RESHADE__ < 40000
         ui_type = "drag";
     #else
         ui_type = "slider";
@@ -22,7 +22,7 @@ uniform float inner_radius <
 > = 0;
 
 uniform int number_splices <
-        #if __RESHADE__ < 40000
+    #if __RESHADE__ < 40000
         ui_type = "drag";
     #else
         ui_type = "slider";

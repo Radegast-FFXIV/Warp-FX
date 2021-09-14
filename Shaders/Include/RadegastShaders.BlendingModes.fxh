@@ -5,30 +5,43 @@ uniform int blending_mode <
     ui_tooltip = "Choose a blending mode.";
 > = 0;
 
-float4 applyBlendingMode(float4 base, float4 color) {
-    switch(blending_mode)
-        {
-            case 1:
-                color += base;
-                break;
-            case 2:
-                color *= base;
-                break;
-            case 3:
-                color -= base;
-                break;
-            case 4:
-                color /= base;
-                break;
-            case 5:
-                if(length(color.rgb) > length(base.rgb))
-                    color = base;
-                break;
-            case 6:
-                if(length(color.rgb) < length(base.rgb))
-                    color = base;
-                break;
-        }  
-
+float4 applyBlendingMode(float4 base, float4 color) { 
+    switch(blending_mode) {
+        case 1:
+            return color + base;
+        case 2:
+            return color * base;
+        case 3:
+            return color - base;
+        case 4:
+            return color / base;
+        case 5:
+            if(length(color.rgb) > length(base.rgb)) return base;
+            return color;
+        case 6:
+            if(length(color.rgb) < length(base.rgb)) return base;
+            return color;
+    }  
     return color;
+}
+
+float4 applyBlendingMode(float4 base, float4 color, float percent) {    
+    switch(blending_mode) {
+        case 1:
+            return lerp(base, color + base, percent);
+        case 2:
+            return lerp(base, color * base, percent);
+        case 3:
+            return lerp(base, color - base, percent);
+        case 4:
+            return lerp(base, color / base, percent);
+        case 5:
+            if(length(color.rgb) > length(base.rgb)) return base;
+            return color;
+        case 6:
+            if(length(color.rgb) < length(base.rgb)) return base;
+            return color;
+    }  
+    return color;
+
 }

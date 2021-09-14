@@ -56,7 +56,7 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
     const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
 
-    float2 center = coordinates;
+    float2 center = coordinates / 2.0;
     if (use_mouse_point) 
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
 
@@ -78,19 +78,17 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
         if(anim_mag > 0)
             tc = (tc-center) * lerp(1.0, smoothstep(0.0, radius/dist, percent), anim_mag * 0.75);
         else
-            tc = (tc-center) * lerp(1.0, pow(percent, 1.0 + anim_mag * 0.75) * radius/dist, 1.0 - percent);
+            tc = (tc-center) * lerp(1.0, pow(abs(percent), 1.0 + anim_mag * 0.75) * radius/dist, 1.0 - percent);
 
         tc += (2*center);
         tc.x *= ar;
 
         color = tex2D(samplerColor, tc);
+        color = applyBlendingMode(base, color, 1 - percent); 
     }
     else {
         color = tex2D(samplerColor, texcoord);
     }
-
-    if(depth >= min_depth)
-        color = applyBlendingMode(base, color);  
 
     return color;
 }

@@ -33,6 +33,20 @@ sampler ssTarget {
     Format = RGBA16;
 };
 
+float get_pix_w() {
+    float output;
+    switch(direction) {
+        case 0:
+        case 1:
+            output = scan_speed * BUFFER_RCP_WIDTH;
+            break;
+        case 2:
+        case 3:
+            output = scan_speed * BUFFER_RCP_HEIGHT;
+            break;
+    }
+    return output;
+}
 
 // Vertex Shader
 void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
@@ -51,19 +65,55 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
     position = float4( texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
 };
 
+// Pixel Shaders
 void SlitScan(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 color : SV_TARGET)
 {
-    float4 col_pixels =  tex2D(samplerColor, float2(x_col, texcoord.y));
-    const float pix_w =  scan_speed * BUFFER_RCP_WIDTH;
+    float4 col_pixels;
+    float scan_col = animate ? anim_rate.x : x_col;
 
-    float slice_to_fill = (anim_rate * pix_w) % 1;
+    switch(direction) {
+        case 0:
+        case 1:
+            col_pixels =  tex2D(samplerColor, float2(scan_col, texcoord.y));
+            break;
+        case 2:
+        case 3:
+            col_pixels =  tex2D(samplerColor, float2(texcoord.x, scan_col));
+            break;
+
+    } 
+    float pix_w = get_pix_w();
+    float slice_to_fill;
+    switch(direction){
+        case 0:
+        case 2:
+            slice_to_fill = (frame_rate * pix_w) % 1;
+            break;
+        case 1:
+        case 3:
+            slice_to_fill = abs(1-((frame_rate * pix_w) % 1));
+            break;
+    } 
 
     float4 cols = tex2Dfetch(ssTarget, texcoord);
     float4 col_to_write = tex2Dfetch(ssTarget, texcoord);
-    if(texcoord.x >= slice_to_fill - pix_w && texcoord.x <= slice_to_fill + pix_w)
-        col_to_write.rgba = col_pixels.rgba;
-    else
-        discard;
+    switch(direction) {
+        case 0:
+        case 1:
+            if(texcoord.x >= slice_to_fill - pix_w && texcoord.x <= slice_to_fill + pix_w)
+                col_to_write.rgba = col_pixels.rgba;
+            else
+                discard;
+            break;
+        case 2:
+        case 3:
+            if(texcoord.y >= slice_to_fill - pix_w && texcoord.y <= slice_to_fill + pix_w)
+                col_to_write.rgba = col_pixels.rgba;
+            else
+                discard;
+            break;
+    }
+    
     color = col_to_write;
 };
 
@@ -72,20 +122,50 @@ void SlitScanPost(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out flo
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
     float2 uv = texcoord;
     float4 screen = tex2D(samplerColor, texcoord);
-    float pix_w =  scan_speed * BUFFER_RCP_WIDTH;
-    uv.x +=  (anim_rate * pix_w ) - x_col % 1 ;
+    float pix_w = get_pix_w();
+    float scan_col;
+    
+    if(animate) scan_col = anim_rate.x;
+    else scan_col = x_col;
+
+    switch(direction) {
+        case 0:
+            uv.x +=  (frame_rate * pix_w) - scan_col % 1 ;
+            break;
+        case 1:
+            uv.x -= (frame_rate * pix_w) - (1 - scan_col) % 1 ;
+            break;
+        case 2:
+            uv.y +=  (frame_rate * pix_w) - scan_col % 1 ;
+            break;
+        case 3:
+            uv.y -=  (frame_rate * pix_w) - (1 - scan_col) % 1 ;
+            break;
+    }
+    
     float4 scanned = tex2D(ssTarget, uv);
 
 
-    float4 mask = step(texcoord.x, x_col);
-
+    float4 mask;
+    switch(direction) {
+        case 0:
+            mask = step(texcoord.x, scan_col);
+            break;
+        case 1:
+            mask = step(scan_col, texcoord.x);
+            break;
+        case 2:
+            mask = step(texcoord.y, scan_col);
+            break;
+        case 3:
+            mask = step(scan_col, texcoord.y);
+            break;
+    }
     if(depth >= min_depth)
         color = lerp(screen, scanned, mask);
     else
-        color = screen;
+        color = screen; 
 }
-
-
 
 technique SlitScan <
 ui_label="Slit Scan";

@@ -3,6 +3,7 @@
 uniform int wave_type <
     ui_type = "combo";
     ui_label = "Wave Type";
+    ui_tooltip = "Selects the type of distortion to apply.";
     ui_items = "X/X\0X/Y\0";
     ui_tooltip = "Which axis the distortion should be performed against.";
 > = 1;
@@ -13,7 +14,11 @@ uniform float angle <
     #else
         ui_type = "slider";
     #endif
-    ui_min = -360.0; ui_max = 360.0; ui_step = 1.0;
+    ui_label = "Angle";
+    ui_tooltip = "The angle at which the distortion occurs.";
+    ui_min = -360.0; 
+    ui_max = 360.0; 
+    ui_step = 1.0;
 > = 0.0;
 
 uniform float period <
@@ -22,8 +27,10 @@ uniform float period <
     #else
         ui_type = "slider";
     #endif
-    ui_min = 0.1; ui_max = 10.0;
-    ui_tooltip = "The wavelength of the distortion. Smaller values make for a\nlonger wavelength.";
+    ui_label = "Phase";
+    ui_min = 0.1; 
+    ui_max = 10.0;
+    ui_tooltip = "The wavelength of the distortion. Smaller values make for a longer wavelength.";
 > = 3.0;
 
 uniform float amplitude <
@@ -32,7 +39,9 @@ uniform float amplitude <
     #else
         ui_type = "slider";
     #endif
-    ui_min = -1.0; ui_max = 1.0;
+    ui_label = "Amplitude";
+    ui_min = -1.0; 
+    ui_max = 1.0;
     ui_tooltip = "The amplitude of the distortion in each direction.";
 > = 0.075;
 
@@ -42,14 +51,16 @@ uniform float phase <
     #else
         ui_type = "slider";
     #endif
-    ui_min = -5.0; ui_max = 5.0;
+    ui_label = "Phase";
+    ui_min = -5.0; 
+    ui_max = 5.0;
     ui_tooltip = "The offset being applied to the distortion's waves.";
 > = 0.0;
 
 uniform float min_depth <
     #if __RESHADE__ < 40000
         ui_type = "drag";
-    #else 
+    #else
         ui_type = "slider";
     #endif
     ui_label="Minimum Depth";
@@ -61,7 +72,7 @@ uniform int animate <
     ui_type = "combo";
     ui_label = "Animate";
     ui_items = "No\0Amplitude\0Phase\0Angle\0";
-    ui_tooltip = "Enable or disable the animation. Animates the wave effect by phase,\namplitude, or angle.";
+    ui_tooltip = "Enable or disable the animation. Animates the wave effect by phase, amplitude, or angle.";
 > = 0;
 
 uniform float anim_rate <
