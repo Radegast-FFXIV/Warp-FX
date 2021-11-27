@@ -1,3 +1,5 @@
+#include "Include/RadegastShaders.Depth.fxh"
+
 uniform float x_col <
     #if __RESHADE__ < 40000
         ui_type = "drag";
@@ -22,18 +24,6 @@ uniform float scan_speed <
     ui_max = 3.0;
     ui_min = 0.0;
 > = 1.0;
-
-uniform float min_depth <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else 
-        ui_type = "slider";
-    #endif
-    ui_label="Minimum Depth";
-    ui_tooltip="Unmasks anything before a set depth.";
-    ui_min=0.0;
-    ui_max=1.0;
-> = 0;
 
 uniform int direction <
     ui_type = "combo";

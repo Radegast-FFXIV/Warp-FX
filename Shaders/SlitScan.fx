@@ -107,8 +107,11 @@ void SlitScan(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out float4 
             break;
         case 2:
         case 3:
-            if(texcoord.y >= slice_to_fill - pix_w && texcoord.y <= slice_to_fill + pix_w)
-                col_to_write.rgba = col_pixels.rgba;
+            if(texcoord.y >= slice_to_fill - pix_w && texcoord.y <= slice_to_fill + pix_w){
+                
+                    col_to_write.rgba = col_pixels.rgba;
+               
+            }
             else
                 discard;
             break;
@@ -161,10 +164,21 @@ void SlitScanPost(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out flo
             mask = step(scan_col, texcoord.y);
             break;
     }
-    if(depth >= min_depth)
+    
+    bool inDepthBounds;
+    if(depth_mode == 0)
+        inDepthBounds = depth >= depth_threshold;
+    else 
+        inDepthBounds = depth <= depth_threshold;
+
+    if(inDepthBounds)
         color = lerp(screen, scanned, mask);
     else
         color = screen; 
+
+
+    
+    
 }
 
 technique SlitScan <

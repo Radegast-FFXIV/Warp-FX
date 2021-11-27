@@ -26,6 +26,13 @@ uniform float center_y <
     ui_max = 360.0;
 > =0;
 
+uniform int mode <
+    ui_type = "combo";
+    ui_label = "Mode";
+    ui_items = "Tiny Planet\0Kaleidoscope\0";
+    ui_tooltip = "Changes the mode between Tiny Planet and Kaleidoscope mode.";
+> = 0;
+
 uniform float2 offset <
     #if __RESHADE__ < 40000
         ui_type = "drag";

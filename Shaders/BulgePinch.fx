@@ -60,6 +60,8 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
     if (use_mouse_point) 
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
 
+    float2 offset_center = offset_coords / 2.0;
+
     float2 tc = texcoord - center;
 
     float4 color;
@@ -67,29 +69,59 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
 
     center.x /= ar;
+    offset_center.x /= ar;
     tc.x /= ar;
 
     float dist = distance(tc, center);
-    if (dist < radius && depth >= min_depth)
+
+    float anim_mag = (animate == 1 ? magnitude * sin(radians(anim_rate * 0.05)) : magnitude);
+    float tension_radius = lerp(dist, radius, tension);
+    float percent = (dist)/tension_radius;
+    if(anim_mag > 0)
+        tc = (tc-center) * lerp(1.0, smoothstep(0.0, tension_radius/dist, percent), anim_mag * 0.75);
+    else
+        tc = (tc-center) * lerp(1.0, pow(abs(percent), 1.0 + anim_mag * 0.75) * tension_radius/dist, 1.0 - percent);
+
+    if(use_offset_coords) {
+        tc += (2 * offset_center);
+    }
+    else 
+        tc += (2 * center);
+    tc.x *= ar;
+
+    float out_depth;
+    bool inDepthBounds;
+    
+    if (depth_mode == 0) {
+        out_depth =  ReShade::GetLinearizedDepth(texcoord).r;
+        inDepthBounds = out_depth >= depth_threshold;
+    }
+    else{
+        out_depth = ReShade::GetLinearizedDepth(tc).r;
+        inDepthBounds = out_depth <= depth_threshold;
+    }
+       
+    if (tension_radius >= dist && inDepthBounds)
     {
-        float anim_mag = (animate == 1 ? magnitude * sin(radians(anim_rate * 0.05)) : magnitude);
-        float tension_radius = lerp(dist, radius, tension);
-        float percent = (dist)/tension_radius;
-        if(anim_mag > 0)
-            tc = (tc-center) * lerp(1.0, smoothstep(0.0, radius/dist, percent), anim_mag * 0.75);
-        else
-            tc = (tc-center) * lerp(1.0, pow(abs(percent), 1.0 + anim_mag * 0.75) * radius/dist, 1.0 - percent);
-
-        tc += (2*center);
-        tc.x *= ar;
-
-        color = tex2D(samplerColor, tc);
-        color = applyBlendingMode(base, color, 1 - percent); 
+        if(use_offset_coords){
+            if(dist <= tension_radius)
+                color = tex2D(samplerColor, tc);
+            else
+                color = tex2D(samplerColor, texcoord);
+        } else
+            color = tex2D(samplerColor, tc);
+        color = applyBlendingMode(base, color, 1-min(tension_radius, 1)); 
     }
     else {
         color = tex2D(samplerColor, texcoord);
     }
 
+    if(set_max_depth_behind) {
+        const float mask_front = ReShade::GetLinearizedDepth(texcoord).r;
+        if(mask_front < depth_threshold)
+            color = tex2D(samplerColor, texcoord);
+    }
+    
     return color;
 }
 

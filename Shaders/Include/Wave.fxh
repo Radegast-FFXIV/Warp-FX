@@ -1,3 +1,4 @@
+#include "Include/RadegastShaders.Depth.fxh"
 #include "Include/RadegastShaders.BlendingModes.fxh"
 
 uniform int wave_type <
@@ -27,7 +28,7 @@ uniform float period <
     #else
         ui_type = "slider";
     #endif
-    ui_label = "Phase";
+    ui_label = "Period";
     ui_min = 0.1; 
     ui_max = 10.0;
     ui_tooltip = "The wavelength of the distortion. Smaller values make for a longer wavelength.";
@@ -56,17 +57,6 @@ uniform float phase <
     ui_max = 5.0;
     ui_tooltip = "The offset being applied to the distortion's waves.";
 > = 0.0;
-
-uniform float min_depth <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_label="Minimum Depth";
-    ui_min=0.0;
-    ui_max=1.0;
-> = 0;
 
 uniform int animate <
     ui_type = "combo";

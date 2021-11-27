@@ -70,47 +70,58 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     const float _c = cos(-theta);
 
     tc = float2(dot(tc - center, float2(c, -s)), dot(tc - center, float2(s, c)));
-    if(depth >= min_depth){
-        if(wave_type == 0)
-        {
-            switch(animate)
-            {
-                default:
-                    tc.x += amplitude * sin((tc.x * period * 10) + phase);
-                    break;
-                case 1:
-                    tc.x += (sin(anim_rate * 0.001) * amplitude) * sin((tc.x * period * 10) + phase);
-                    break;
-                case 2:
-                    tc.x += amplitude * sin((tc.x * period * 10) + (anim_rate * 0.001));
-                    break;
-            }
+    if(wave_type == 0) {
+        switch(animate) {
+            default:
+                tc.x += amplitude * sin((tc.x * period * 10) + phase);
+                break;
+            case 1:
+                tc.x += (sin(anim_rate * 0.001) * amplitude) * sin((tc.x * period * 10) + phase);
+                break;
+            case 2:
+                tc.x += amplitude * sin((tc.x * period * 10) + (anim_rate * 0.001));
+                break;
         }
-        else
-        {
-            switch(animate)
-            {
-                default:
-                    tc.x +=  amplitude * sin((tc.y * period * 10) + phase);
-                    break;
-                case 1:
-                    tc.x += (sin(anim_rate * 0.001) * amplitude) * sin((tc.y * period * 10) + phase);
-                    break;
-                case 2:
-                    tc.x += amplitude * sin((tc.y * period * 10) + (anim_rate * 0.001));
-                    break;
-            }
+    } else {
+        switch(animate) {
+            default:
+                tc.x +=  amplitude * sin((tc.y * period * 10) + phase);
+                break;
+            case 1:
+                tc.x += (sin(anim_rate * 0.001) * amplitude) * sin((tc.y * period * 10) + phase);
+                break;
+            case 2:
+                tc.x += amplitude * sin((tc.y * period * 10) + (anim_rate * 0.001));
+                break;
         }
-        tc = float2(dot(tc, float2(_c, -_s)), dot(tc, float2(_s, _c))) + center;
+    }
+    tc = float2(dot(tc, float2(_c, -_s)), dot(tc, float2(_s, _c))) + center;
 
-        tc.x *= ar;
+    tc.x *= ar;
 
+    float out_depth;
+    bool inDepthBounds;
+    if ( depth_mode == 0) {
+        out_depth =  ReShade::GetLinearizedDepth(texcoord).r;
+        inDepthBounds = out_depth >= depth_threshold;
+    } else {
+        out_depth = ReShade::GetLinearizedDepth(tc).r;
+        inDepthBounds = out_depth <= depth_threshold;
+    }
+
+    if(inDepthBounds){
         color = tex2D(samplerColor, tc);
         color = applyBlendingMode(base, color);
     }
     else
     {
         color = tex2D(samplerColor, texcoord);
+    }
+
+    if(set_max_depth_behind) {
+        const float mask_front = ReShade::GetLinearizedDepth(texcoord).r;
+        if(mask_front < depth_threshold)
+            color = tex2D(samplerColor, texcoord);
     }
 
     return color;

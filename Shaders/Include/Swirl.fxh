@@ -1,3 +1,4 @@
+#include "Include/RadegastShaders.Depth.fxh"
 #include "Include/RadegastShaders.CommonPositional.fxh"
 #include "Include/RadegastShaders.BlendingModes.fxh"
 #include "Include/RadegastShaders.Transforms.fxh"

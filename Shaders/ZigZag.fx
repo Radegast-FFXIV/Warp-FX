@@ -54,38 +54,66 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     if (use_mouse_point) 
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
 
+    float2 offset_center = offset_coords / 2.0;
+
     float2 tc = texcoord - center;
 
     center.x /= ar;
+    offset_center.x /= ar;
     tc.x /= ar;
 
-
-    if (depth >= min_depth)
-    {
-        const float dist = distance(tc, center);
-        const float tension_radius = lerp(radius-dist, radius, tension);
-        const float percent = max(radius-dist, 0) / tension_radius;
-        const float percentSquared = percent * percent;
-        const float theta = percentSquared * (animate == 1 ? amplitude * sin(anim_rate * 0.0005) : amplitude) * sin(percentSquared / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate : 0)));
+    const float dist = distance(tc, center);
+    const float tension_radius = lerp(radius-dist, radius, tension);
+    const float percent = max(radius-dist, 0) / tension_radius;
+    const float percentSquared = percent * percent;
+    const float theta = percentSquared * (animate == 1 ? amplitude * sin(anim_rate * 0.0005) : amplitude) * sin(percentSquared / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate : 0)));
         
-        if(!mode)
-        {
-            tc = mul(swirlTransform(theta), tc-center);
-        }
-        else
-        {
-            tc = mul(zigzagTransform(theta), tc-center);
-        }
+    if(!mode) {
+        tc = mul(swirlTransform(theta), tc-center);
+    } else {
+        tc = mul(zigzagTransform(theta), tc-center);
+    }
 
-        tc += (2.0 * center);
-        tc.x *= ar;
+    if(use_offset_coords)
+        tc += (2 * offset_center);
+    else 
+        tc += (2 * center);
 
-        color = tex2D(samplerColor, tc);
-        color = applyBlendingMode(base, color, percentSquared);
+    tc.x *= ar;
+
+    float out_depth;
+    bool inDepthBounds;
+    if (depth_mode == 0) {
+        out_depth =  ReShade::GetLinearizedDepth(texcoord).r;
+        inDepthBounds = out_depth >= depth_threshold;
+    }
+    else{
+        out_depth = ReShade::GetLinearizedDepth(tc).r;
+        inDepthBounds = out_depth <= depth_threshold;
+    }
+       
+    if (inDepthBounds)
+    {
+        if(use_offset_coords){
+            float2 offset_coords_adjust = offset_coords;
+            offset_coords_adjust.x *= ar;
+            if(dist <= tension_radius)
+                color = tex2D(samplerColor, tc);
+            else
+                color = tex2D(samplerColor, texcoord);
+        } else
+            color = tex2D(samplerColor, tc);
+        color = applyBlendingMode(base, color, min(abs(theta), 1));
     }
     else
     {
-        color = tex2D(samplerColor, texcoord);
+        color = base;
+    }
+
+    if(set_max_depth_behind) {
+        const float mask_front = ReShade::GetLinearizedDepth(texcoord).r;
+        if(mask_front < depth_threshold)
+            color = tex2D(samplerColor, texcoord);
     }
     
     return color;

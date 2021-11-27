@@ -45,16 +45,20 @@ uniform float aspect_ratio <
     ui_max = 100.0;
 > = 0;
 
-uniform float min_depth <
+uniform bool use_offset_coords <
+    ui_label = "Use Offset Coordinates";
+    ui_tooltip = "Display the distortion in any location besides its original coordinates.";
+> = 0;
+
+uniform float2 offset_coords <
     #if __RESHADE__ < 40000
         ui_type = "drag";
     #else 
         ui_type = "slider";
     #endif
-    ui_label="Minimum Depth";
-    ui_min=0.0;
-    ui_max=1.0;
-> = 0;
+    ui_min = 0.0;
+    ui_max = 1.0;
+> = float2(0.5, 0.5);
 
 uniform float anim_rate <
     source = "timer";
