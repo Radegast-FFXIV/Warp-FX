@@ -17,6 +17,6 @@ uniform int depth_mode <
 > = 0;
 
 uniform bool set_max_depth_behind <
-    ui_label = "Set distortion behind depth?";
+    ui_label = "Set Distortion Behind Foreground";
     ui_tooltip = "(Maximum Depth Threshold Mode only) When enabled, sets the distorted area behind the objects that should come in front of it.";
 > = 0;
