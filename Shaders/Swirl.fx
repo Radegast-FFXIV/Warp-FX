@@ -43,65 +43,107 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     float4 base = tex2D(samplerColor, texcoord);
     const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
+
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
     float2 center = coordinates  / 2.0;
+    float2 offset_center = offset_coords / 2.0;
 
     if (use_mouse_point) 
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
 
     float2 tc = texcoord - center;
+
     float4 color;
 
     center.x /= ar;
+    offset_center.x /= ar;
+
     tc.x /= ar;
 
     const float dist = distance(tc, center);
-    if (depth >= min_depth)
-    {
-        const float dist_radius = radius-dist;
-        const float tension_radius = lerp(radius-dist, radius, tension);
-        float percent; 
-        float theta; 
+    const float dist_radius = radius-dist;
+    const float tension_radius = lerp(radius-dist, radius, tension);
+    const float tension_dist = lerp(dist_radius, tension_radius, tension);
+    float percent; 
+    float theta; 
 
-        if(swirl_mode == 0){
-            percent = max(dist_radius, 0) / tension_radius;   
-            if(inverse && dist < radius)
-                percent = 1 - percent;     
+    if(swirl_mode == 0){
+        percent = max(dist_radius, 0) / tension_radius;   
+        if(inverse && dist < radius)
+            percent = 1 - percent;     
         
-            if(dist_radius > radius-inner_radius)
-                percent = 1;
-            theta = percent * percent * radians(angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
-        }
-        else
-        {
-            float splice_width = (tension_radius-inner_radius) / number_splices;
-            splice_width = frac(splice_width);
-            float cur_splice = max(dist_radius,0)/splice_width;
-            cur_splice = cur_splice - frac(cur_splice);
-            float splice_angle = (angle / number_splices) * cur_splice;
-            if(dist_radius > radius-inner_radius)
-                splice_angle = angle;
-            theta = radians(splice_angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
-        }
+        if(dist_radius > radius-inner_radius)
+            percent = 1;
+        theta = percent * percent * radians(angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
+    } else {
+        float splice_width = (tension_radius-inner_radius) / number_splices;
+        splice_width = frac(splice_width);
+        float cur_splice = max(dist_radius,0)/splice_width;
+        cur_splice = cur_splice - frac(cur_splice);
+        float splice_angle = (angle / number_splices) * cur_splice;
+        if(dist_radius > tension_radius-inner_radius)
+            splice_angle = angle;
+        theta = radians(splice_angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
+    }
 
-        tc = mul(swirlTransform(theta), tc-center);
+    tc = mul(swirlTransform(theta), tc-center);
+    if(use_offset_coords) {
+        tc += (2 * offset_center);
+    }
+    else 
         tc += (2 * center);
-        tc.x *= ar;    
-      
-        color = tex2D(samplerColor, tc);
-        color = applyBlendingMode(base, color, percent * percent);
+    tc.x *= ar;  
+        
+    float out_depth;
+    bool inDepthBounds;
+    if (depth_mode == 0) {
+        out_depth =  ReShade::GetLinearizedDepth(texcoord).r;
+        inDepthBounds = out_depth >= depth_threshold;
+    }
+    else{
+        out_depth = ReShade::GetLinearizedDepth(tc).r;
+        inDepthBounds = out_depth <= depth_threshold;
+    }
+       
+    if (inDepthBounds)
+    {
+        if(use_offset_coords)
+        {
+            if((!swirl_mode && percent) || (swirl_mode && theta))
+                color = tex2D(samplerColor, tc);
+            else
+                color = tex2D(samplerColor, texcoord);
+        } else
+            color = tex2D(samplerColor, tc);
+
+        float blending_factor;
+        if(swirl_mode)
+            blending_factor = blending_amount;
+        else {
+            if(render_type)
+                blending_factor = lerp(0, dist_radius * tension_radius * 10, blending_amount);
+            else
+                blending_factor = blending_amount;
+        }
+        if((!swirl_mode && percent) || (swirl_mode && dist <= radius))
+            color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
+            
     }
     else
     {
         color = base;
     }
 
-    
+    if(set_max_depth_behind) 
+    {
+        const float mask_front = ReShade::GetLinearizedDepth(texcoord).r;
+        if(mask_front < depth_threshold)
+            color = tex2D(samplerColor, texcoord);
+    }
 
     return color;
    
 }
-
 
 // Technique
 technique Swirl< ui_label="Swirl";>
