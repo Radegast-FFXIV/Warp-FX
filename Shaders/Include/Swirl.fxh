@@ -1,7 +1,7 @@
 #include "Include/RadegastShaders.Depth.fxh"
 #include "Include/RadegastShaders.CommonPositional.fxh"
-#include "Include/RadegastShaders.BlendingModes.fxh"
 #include "Include/RadegastShaders.Transforms.fxh"
+#include "Include/RadegastShaders.BlendingModes.fxh"
 
 uniform int swirl_mode <
     ui_type="combo";
@@ -59,3 +59,4 @@ uniform int animate <
     ui_items = "No\0Yes\0";
     ui_tooltip = "Animates the swirl, moving it clockwise and counterclockwise.";
 > = 0;
+

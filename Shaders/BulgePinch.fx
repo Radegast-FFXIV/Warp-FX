@@ -101,6 +101,12 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
         inDepthBounds = out_depth <= depth_threshold;
     }
        
+    float blending_factor;
+    if(render_type)
+        blending_factor = lerp(0, 1 - percent, blending_amount);
+    else
+        blending_factor = blending_amount;
+
     if (tension_radius >= dist && inDepthBounds)
     {
         if(use_offset_coords){
@@ -110,7 +116,8 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
                 color = tex2D(samplerColor, texcoord);
         } else
             color = tex2D(samplerColor, tc);
-        color = applyBlendingMode(base, color, 1-min(tension_radius, 1)); 
+
+        color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
     }
     else {
         color = tex2D(samplerColor, texcoord);

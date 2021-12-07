@@ -92,18 +92,30 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         inDepthBounds = out_depth <= depth_threshold;
     }
        
+    float blending_factor;
+    if(render_type) 
+        blending_factor = lerp(0, percentSquared, blending_amount);
+    else
+        blending_factor = blending_amount;
     if (inDepthBounds)
     {
         if(use_offset_coords){
             float2 offset_coords_adjust = offset_coords;
             offset_coords_adjust.x *= ar;
             if(dist <= tension_radius)
+            {
                 color = tex2D(samplerColor, tc);
+                color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
+            }
             else
                 color = tex2D(samplerColor, texcoord);
         } else
+        {
             color = tex2D(samplerColor, tc);
-        color = applyBlendingMode(base, color, min(abs(theta), 1));
+            color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
+        }
+        
+        
     }
     else
     {

@@ -107,21 +107,35 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
        
     if (inDepthBounds)
     {
-        if(use_offset_coords){
-            if((!swirl_mode && percent) || (swirl_mode && dist <= radius))
+        if(use_offset_coords)
+        {
+            if((!swirl_mode && percent) || (swirl_mode && theta))
                 color = tex2D(samplerColor, tc);
             else
                 color = tex2D(samplerColor, texcoord);
         } else
             color = tex2D(samplerColor, tc);
-        color = applyBlendingMode(base, color, min(abs(theta), 1));
+
+        float blending_factor;
+        if(swirl_mode)
+            blending_factor = blending_amount;
+        else {
+            if(render_type)
+                blending_factor = lerp(0, dist_radius * tension_radius * 10, blending_amount);
+            else
+                blending_factor = blending_amount;
+        }
+        if((!swirl_mode && percent) || (swirl_mode && dist <= radius))
+            color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
+            
     }
     else
     {
         color = base;
     }
 
-    if(set_max_depth_behind) {
+    if(set_max_depth_behind) 
+    {
         const float mask_front = ReShade::GetLinearizedDepth(texcoord).r;
         if(mask_front < depth_threshold)
             color = tex2D(samplerColor, texcoord);

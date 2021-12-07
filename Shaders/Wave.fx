@@ -99,6 +99,15 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 
     tc.x *= ar;
 
+    float blending_factor;
+    if(render_type)
+        blending_factor = lerp(0, abs(amplitude)* lerp(10, 1, abs(amplitude)), blending_amount);
+    else
+        blending_factor = blending_amount;
+    
+    color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
+
+
     float out_depth;
     bool inDepthBounds;
     if ( depth_mode == 0) {
@@ -111,7 +120,8 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 
     if(inDepthBounds){
         color = tex2D(samplerColor, tc);
-        color = applyBlendingMode(base, color);
+    
+        color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
     }
     else
     {

@@ -31,6 +31,7 @@ uniform float tension <
     #else
         ui_type = "slider";
     #endif
+    ui_label = "Tension";
     ui_min = 0.; ui_max = 10.; ui_step = 0.001;
 > = 1.0;
 
@@ -48,6 +49,7 @@ uniform float aspect_ratio <
 uniform bool use_offset_coords <
     ui_label = "Use Offset Coordinates";
     ui_tooltip = "Display the distortion in any location besides its original coordinates.";
+    ui_category = "Offset";
 > = 0;
 
 uniform float2 offset_coords <
@@ -56,6 +58,8 @@ uniform float2 offset_coords <
     #else 
         ui_type = "slider";
     #endif
+    ui_label = "Offset Coordinates";
+    ui_category = "Offset";
     ui_min = 0.0;
     ui_max = 1.0;
 > = float2(0.5, 0.5);
