@@ -13,7 +13,7 @@ BLENDING_COMBO(
 uniform float blending_amount <
     ui_type = "slider";
     ui_label = "Opacity";
-    ui_category = "Blending"
+    ui_category = "Blending";
     ui_tooltip = "Adjusts the blending amount.";
     ui_min = 0.0;
     ui_max = 1.0;
