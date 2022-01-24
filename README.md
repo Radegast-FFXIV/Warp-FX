@@ -3,6 +3,24 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
+## v1.2.0 
+- Added a new Shader: Drunk
+  - Ported from [Xaymar](https://github.com/Xaymar)'s Drunk shader for StreamFX.
+  - Distorts the screen in vertical and horizontal stretching/squishing motions.
+- Changes to the LICENSE in this repo:
+  - The following shader is licensed under GNU GPL v2:
+    - Drunk.fx
+  - All other shaders remain licensed under MIT.
+- Bug Fixes:
+  - Fixed "Bulge/Pinch" Magnitude parameter not being capitalized.
+
+
+## V1.1.0
+- Added foreground depth processing for the following shaders:
+  - Swirl
+  - Zigzag
+  - Wave
+  - Bulge/Pinch
 
 ## v1.0.0 (Baseline)
 

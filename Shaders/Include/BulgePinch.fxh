@@ -8,6 +8,7 @@ uniform float magnitude <
     #else
         ui_type = "slider";
     #endif
+    ui_label = "Magnitude";
     ui_min = -1.0; 
     ui_max = 1.0;
     ui_tooltip = "The magnitude of the distortion. Positive values cause the image to bulge out. Negative values cause the image to pinch in.";    
