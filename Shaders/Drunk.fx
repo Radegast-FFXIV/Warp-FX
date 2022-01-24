@@ -129,12 +129,7 @@ float4 PSDrunkStage1(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV
     const float4 base = tex2D(samplerColor, texcoord);
     float2 tc = texcoord;
 
-    const float theta = radians(anim_rate * 0.01 % 3600);
-    const float s =  sin(theta);
-    const float _s = sin(-theta);
-    const float c =  cos(theta);
-    const float _c = cos(-theta);
-
+    const float theta = radians(angle) * sin(anim_rate * 0.0005 * angle_speed);
 
 	for (uint i = 0; i < 36; i++) {
         uint x = i/6;

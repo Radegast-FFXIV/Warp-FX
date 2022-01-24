@@ -65,6 +65,26 @@ uniform float2 p_drunk_speed<
 
 > = float2(2.0, 2.0);
 
+uniform float angle <
+    ui_type = "slider";
+    ui_label = "Bending Angle";
+    ui_category = "Distortion";
+    ui_min = -1800.0; 
+    ui_max = 1800.0; 
+    ui_tooltip = "Controls how much the distortion bends.";
+    ui_step = 1.0;
+> = 180.0;
+
+uniform float angle_speed<
+    ui_type = "slider";
+    ui_label = "Bending Speed";
+    ui_category = "Distortion";
+    ui_min = 0.0; 
+    ui_max = 10.0;
+    ui_step = 0.1;
+    ui_tooltip = "Controls the speed of the bending.";    
+
+> = 1.0;
 
 uniform float anim_rate <
     source = "timer";

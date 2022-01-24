@@ -3,6 +3,11 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
+## V1.2.1
+- Updated Drunk shader:
+  - Added two new params: Bending Angle and Bending Speed
+    - Bending Angle: Controls the amount of bending the distortion creates.
+    - Bending Speed: Controls the speed of the bending distortion.
 ## v1.2.0 
 - Added a new Shader: Drunk
   - Ported from [Xaymar](https://github.com/Xaymar)'s Drunk shader for StreamFX.
