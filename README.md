@@ -59,3 +59,9 @@ Emulates the projection of the screen onto a sphere. Can be used to create a tin
 ### Slit Scan
 
 Scans a column of pixels and outputs them to a sliding buffer to the side.
+
+
+### Drunk
+
+A port of the OBS StreamFX filter with the same name. This shader behaves similarly to the
+original version of the Drunk shader. The newer version will be implemented in the future.
