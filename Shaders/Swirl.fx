@@ -126,7 +126,7 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
                 blending_factor = blending_amount;
         }
         if((!swirl_mode && percent) || (swirl_mode && dist <= radius))
-            color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
+            color.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, color.rgb, blending_factor);
             
     }
     else

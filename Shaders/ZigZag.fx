@@ -105,14 +105,14 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
             if(dist <= tension_radius)
             {
                 color = tex2D(samplerColor, tc);
-                color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
+                color.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, color.rgb, blending_factor);
             }
             else
                 color = tex2D(samplerColor, texcoord);
         } else
         {
             color = tex2D(samplerColor, tc);
-            color.rgb = ComHeaders::Blending::Blend(render_type, base, color, blending_factor);
+            color.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, color.rgb, blending_factor);
         }
         
         
@@ -132,7 +132,7 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 }
 
 // Technique
-technique ZigZag
+technique ZigZag<ui_label="Zigzag";>
 {
     pass p0
     {
