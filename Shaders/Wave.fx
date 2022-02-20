@@ -64,12 +64,12 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     tc.x /= ar;
 
     const float theta = radians(animate == 3 ? (anim_rate * 0.01 % 360.0) : angle);
-    const float s =  sin(theta);
-    const float _s = sin(-theta);
-    const float c =  cos(theta);
-    const float _c = cos(-theta);
+    float2 sc; 
+    float2 _sc;
+    sincos(theta, sc.x, sc.y);
+    sincos(-theta, _sc.x, _sc.y);
 
-    tc = float2(dot(tc - center, float2(c, -s)), dot(tc - center, float2(s, c)));
+    tc = float2(dot(tc - center, float2(sc.y, _sc.x )), dot(tc - center, float2(sc.x, sc.y)));
     if(wave_type == 0) {
         switch(animate) {
             default:
@@ -95,7 +95,7 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
                 break;
         }
     }
-    tc = float2(dot(tc, float2(_c, -_s)), dot(tc, float2(_s, _c))) + center;
+    tc = float2(dot(tc, float2(_sc.y, _sc.x)), dot(tc, float2(_sc.x, _sc.y))) + center;
 
     tc.x *= ar;
 
@@ -137,7 +137,7 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     return color;
 }
 
-technique Wave<ui_label="Wave";>
+technique Wave <ui_label="Wave";>
 {
     pass p0
     {

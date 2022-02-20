@@ -93,7 +93,7 @@ float4 TinyPlanet(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TA
 }
 
 // Technique
-technique TinyPlanet
+technique TinyPlanet <ui_label="Tiny Planet";>
 {
      pass p0
     {

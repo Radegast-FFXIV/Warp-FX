@@ -132,7 +132,7 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 }
 
 // Technique
-technique ZigZag<ui_label="Zigzag";>
+technique ZigZag <ui_label="Zigzag";>
 {
     pass p0
     {
