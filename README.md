@@ -3,6 +3,12 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
+## V1.2.2
+- Bug Fixes:
+  - Drunk Shader should now work on DX9 and should also be a bit faster.
+- Misc:
+  - TinyPlanet now displays as "Tiny Planet" in the effects list.
+  - Minor syntactical changes to Swirl, TinyPlanet, 
 ## V1.2.1
 - Updated Drunk shader:
   - Added two new params: Bending Angle and Bending Speed
