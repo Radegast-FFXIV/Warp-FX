@@ -67,25 +67,14 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     float percent; 
     float theta; 
 
-    if(swirl_mode == 0){
-        percent = max(dist_radius, 0) / tension_radius;   
-        if(inverse && dist < radius)
-            percent = 1 - percent;     
+    percent = max(dist_radius, 0) / tension_radius;   
+    if(inverse && dist < radius)
+        percent = 1 - percent;     
         
-        if(dist_radius > radius-inner_radius)
-            percent = 1;
-        theta = percent * percent * radians(angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
-    } else {
-        float splice_width = (tension_radius-inner_radius) / number_splices;
-        splice_width = frac(splice_width);
-        float cur_splice = max(dist_radius,0)/splice_width;
-        cur_splice = cur_splice - frac(cur_splice);
-        float splice_angle = (angle / number_splices) * cur_splice;
-        if(dist_radius > tension_radius-inner_radius)
-            splice_angle = angle;
-        theta = radians(splice_angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
-    }
-
+    if(dist_radius > radius-inner_radius)
+        percent = 1;
+    theta = percent * percent * radians(angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
+  
     tc = mul(swirlTransform(theta), tc-center);
     if(use_offset_coords) {
         tc += (2 * offset_center);
@@ -109,7 +98,7 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     {
         if(use_offset_coords)
         {
-            if((!swirl_mode && percent) || (swirl_mode && theta))
+            if(percent)
                 color = tex2D(samplerColor, tc);
             else
                 color = tex2D(samplerColor, texcoord);
@@ -117,17 +106,14 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
             color = tex2D(samplerColor, tc);
 
         float blending_factor;
-        if(swirl_mode)
+        
+        if(render_type)
+            blending_factor = lerp(0, dist_radius * tension_radius * 10, blending_amount);
+        else
             blending_factor = blending_amount;
-        else {
-            if(render_type)
-                blending_factor = lerp(0, dist_radius * tension_radius * 10, blending_amount);
-            else
-                blending_factor = blending_amount;
-        }
-        if((!swirl_mode && percent) || (swirl_mode && dist <= radius))
-            color.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, color.rgb, blending_factor);
-            
+        
+        if(percent)
+            color.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, color.rgb, blending_factor);     
     }
     else
     {
@@ -142,7 +128,6 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     }
 
     return color;
-   
 }
 
 // Technique

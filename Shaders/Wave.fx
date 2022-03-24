@@ -66,10 +66,10 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     const float theta = radians(animate == 3 ? (anim_rate * 0.01 % 360.0) : angle);
     float2 sc; 
     float2 _sc;
-    sincos(theta, sc.x, sc.y);
-    sincos(-theta, _sc.x, _sc.y);
+    sincos(theta, sc.y, sc.x);
+    sincos(-theta, _sc.y, _sc.x);
 
-    tc = float2(dot(tc - center, float2(sc.y, _sc.x )), dot(tc - center, float2(sc.x, sc.y)));
+    tc = float2(dot(tc - center, float2(sc.x, -sc.y )), dot(tc - center, float2(sc.y, sc.x)));
     if(wave_type == 0) {
         switch(animate) {
             default:
@@ -95,7 +95,7 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
                 break;
         }
     }
-    tc = float2(dot(tc, float2(_sc.y, _sc.x)), dot(tc, float2(_sc.x, _sc.y))) + center;
+    tc = float2(dot(tc, float2(_sc.x, -_sc.y)), dot(tc, float2(_sc.y, _sc.x))) + center;
 
     tc.x *= ar;
 

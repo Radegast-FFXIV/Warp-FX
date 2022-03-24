@@ -3,13 +3,6 @@
 #include "Include/RadegastShaders.Transforms.fxh"
 #include "Include/RadegastShaders.BlendingModes.fxh"
 
-uniform int swirl_mode <
-    ui_type="combo";
-    ui_label="Mode";
-    ui_items="Normal\0Spliced Radial\0";
-    ui_tooltip="Selects which swirl mode to display.\nNormal Mode -- Contiguously twists pixels around a point.\nSpliced Radials -- Creates incrementally rotated circular splices.";
-> = 0;
-
 uniform float inner_radius <
     #if __RESHADE__ < 40000
         ui_type = "drag";

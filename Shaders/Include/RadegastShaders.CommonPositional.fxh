@@ -19,7 +19,7 @@ uniform float2 coordinates <
     ui_tooltip="The X and Y position of the center of the effect.";
     ui_min = 0.0; 
     ui_max = 1.0;
-> = float2(0.25, 0.25);
+> = float2(0.5, 0.5);
 
 uniform bool use_mouse_point <
     ui_label="Use Mouse Coordinates";
