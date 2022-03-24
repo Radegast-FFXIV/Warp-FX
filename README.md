@@ -3,6 +3,12 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
+## V1.2.3
+- Minor Changes
+  - We've split out Spliced Radials from Swirl. They are now in separate files. This is to reduce the number of instructions per shader to make it a bit easier to debug.
+- Bug Fixes:
+  - The default position for the center of most positional shaders is now (0.5, 0.5) instead of (0.25, 0.25).
+  - There was an issue where adjusting the angle for Wave was causing the effect to display incorrectly.
 ## V1.2.2
 - Bug Fixes:
   - Drunk Shader should now work on DX9 and should also be a bit faster.
