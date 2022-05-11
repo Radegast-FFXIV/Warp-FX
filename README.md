@@ -3,6 +3,9 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
+## V1.2.4
+- Minor Changes
+  - Updated README
 ## V1.2.3
 - Minor Changes
   - We've split out Spliced Radials from Swirl. They are now in separate files. This is to reduce the number of instructions per shader to make it a bit easier to debug.
@@ -43,42 +46,53 @@ A suite of shaders that in no way make your game look any more appealing. Use th
 
 - Baseline release for already released shaders. This should provide more stability to end-users.
 
+# Installation
+## Prerequisites
+In order to use these Shaders by downloading it from the page, you will need to do the following steps first. This guide assumes that you have a centralized ReShade distribution or an already existing ReShade Shaders folder that may not have been updated via the ReShade application in some time:
+1. Download the Blending.fxh file. This file is normally included when adding ReShade to a game, but is not included in this repository to reduce version diffences. You can download Blending.fxh directly [here](https://github.com/crosire/reshade-shaders/blob/slim/Shaders/Blending.fxh).
+
+2. Place the downloaded Blending.fxh in your Shaders folder where all other ReShade shaders are located.
+
+## Installing WarpFX shaders
+1. Download the repository either as a ZIP file from the "Code" tab or the Releases page.
+2. Extract the ZIP file to your Shaders folder that was created by ReShade, or a centralized Shaders folder if you've chosen to centralize your shaders in a specific location. You should now be able to access the shaders from your ReShade menu. You may need to reload your shaders if you are already in-game.
+
 # Shaders
 
 This list of shaders will grow as I figure out more ways of exploding peoples screens into some interesting effects.
 
-### Swirl
+## Spliced Radials
+Creates rotated concentric circles at a set location, similar to Jean Fraucher's photography.
 
-Distorts the screen by twisting pixels around a certain point. There are two modes to Swirl:
+## Swirl
+Distorts the screen by twisting pixels around a certain point. You can adjust the radius, angle, and many other parameters of the distortion.
 
-- Normal (default): The typical distortion as stated above.
-- Spliced Radial: Instead of a contiguous swirl, creates a number of concentric circles and rotates them according to the parameters in the shader.
 
-### Wave
+## Wave
 
 Distorts the screen in one of two ways: a sinesoidal distortion or a stretch/squeeze distortion.
 
-### Zigzag
+## Zigzag
 
 A more advanced version of the Swirl shader that twists pixels back and forth around a certain point. There are two modes to Zigzag:
 
 - Around Center (default): The typical distortion as stated above.
 - Out from Center: Pulls and pushes pixels around a center point, giving the illusion of a ripple on the surface of water.
 
-### Bulge/Pinch
+## Bulge/Pinch
 
 Stretches or squeezes pixels around a certain point.
 
-### Tiny Planet
+## Tiny Planet
 
 Emulates the projection of the screen onto a sphere. Can be used to create a tiny planet from a horizon.
 
-### Slit Scan
+## Slit Scan
 
 Scans a column of pixels and outputs them to a sliding buffer to the side.
 
 
-### Drunk
+## Drunk
 
 A port of the OBS StreamFX filter with the same name. This shader behaves similarly to the
 original version of the Drunk shader. The newer version will be implemented in the future.
