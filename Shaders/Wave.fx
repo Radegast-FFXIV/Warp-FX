@@ -2,8 +2,8 @@
 /* Wave Shader - by Radegast Stravinsky of Ultros.                                                */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
-#include "Include/Wave.fxh"
 #include "ReShade.fxh"
+#include "Include/Wave.fxh"
 
 texture texColorBuffer : COLOR;
 
@@ -34,23 +34,6 @@ sampler samplerColor
 
     SRGBTexture = false;
 };
-
-// Vertex Shader
-void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
-{
-    if (id == 2)
-        texcoord.x = 2.0;
-    else
-        texcoord.x = 0.0;
-
-    if (id == 1)
-        texcoord.y  = 2.0;
-    else
-        texcoord.y = 0.0;
-
-    position = float4( texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
-
-}
 
 float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET 
 {
@@ -141,7 +124,7 @@ technique Wave <ui_label="Wave";>
 {
     pass p0
     {
-        VertexShader = FullScreenVS;
+        VertexShader = PostProcessVS;
         PixelShader = Wave;
     }
 }

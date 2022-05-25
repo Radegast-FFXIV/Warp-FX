@@ -25,22 +25,6 @@ sampler samplerColor
 
 };
 
-// Vertex Shader
-void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out float2 texcoord : TEXCOORD0)
-{
-    if (id == 2)
-        texcoord.x = 2.0;
-    else
-        texcoord.x = 0.0;
-
-    if (id == 1)
-        texcoord.y  = 2.0;
-    else
-        texcoord.y = 0.0;
-
-    position = float4( texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
-}
-
 // Pixel Shaders (in order of appearance in the technique)
 float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
@@ -136,7 +120,7 @@ technique ZigZag <ui_label="Zigzag";>
 {
     pass p0
     {
-        VertexShader = FullScreenVS;
+        VertexShader = PostProcessVS;
         PixelShader = ZigZag;
     }
 
