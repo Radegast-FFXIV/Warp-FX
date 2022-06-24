@@ -116,9 +116,8 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
 
 // Pixel Shader
 float4 PSDrunkStage1(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET {
-	float out_depth;
     const float4 base = tex2D(samplerColor, texcoord);
-
+    const float depth = ReShade::GetLinearizedDepth(texcoord).r;
 	float2 fade = frac(texcoord.xy * MAX_LINE);
 	fade = (sin((fade - 0.5) * 3.14159265) + 1.0) * 0.5;
 	
@@ -140,40 +139,16 @@ float4 PSDrunkStage1(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV
 	float2 uv = lerp(uv_t, uv_b, fade.y);
 
     float4 result = tex2D(samplerColor, uv);
-    bool inDepthBounds;
-    if (depth_mode == 0) 
-    {
-        out_depth =  ReShade::GetLinearizedDepth(texcoord).r;
-        inDepthBounds = out_depth >= depth_threshold;
-    }
-    else
-    {
-        out_depth = ReShade::GetLinearizedDepth(uv).r;
-        inDepthBounds = out_depth <= depth_threshold;
-    }
-         
-    if (depth_mode == 0) 
-    {
-        out_depth =  ReShade::GetLinearizedDepth(texcoord).r;
-        inDepthBounds = out_depth >= depth_threshold;
-    }
-    else
-    {
-        out_depth = ReShade::GetLinearizedDepth(uv).r;
-        inDepthBounds = out_depth <= depth_threshold;
-    }
-    if(inDepthBounds) {
+    float out_depth = ReShade::GetLinearizedDepth(uv).r;
+    bool inDepthBounds = out_depth >= depth_bounds.x && out_depth <= depth_bounds.y;
+    
+    if(inDepthBounds)
         result.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, result.rgb, blending_amount);
-        
-
-    } else result = base;
+    else result = base;
 	
-    if(set_max_depth_behind) 
-    {
-        const float mask_front = ReShade::GetLinearizedDepth(texcoord).r;
-        if(mask_front < depth_threshold)
-            result = tex2D(samplerColor, texcoord);
-    }
+    if(depth < min_depth) 
+        result = tex2D(samplerColor, texcoord);
+
     return result;
 }
 

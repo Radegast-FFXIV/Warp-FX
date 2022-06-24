@@ -65,17 +65,9 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 
     tc.x *= ar;
 
-    float out_depth;
-    bool inDepthBounds;
-    if (depth_mode == 0) {
-        out_depth =  ReShade::GetLinearizedDepth(texcoord).r;
-        inDepthBounds = out_depth >= depth_threshold;
-    }
-    else{
-        out_depth = ReShade::GetLinearizedDepth(tc).r;
-        inDepthBounds = out_depth <= depth_threshold;
-    }
-       
+    float out_depth = ReShade::GetLinearizedDepth(tc).r;
+    bool inDepthBounds = out_depth >= depth_bounds.x && out_depth <= depth_bounds.y;
+
     float blending_factor;
     if(render_type) 
         blending_factor = lerp(0, percentSquared, blending_amount);
@@ -106,11 +98,8 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         color = base;
     }
 
-    if(set_max_depth_behind) {
-        const float mask_front = ReShade::GetLinearizedDepth(texcoord).r;
-        if(mask_front < depth_threshold)
-            color = tex2D(samplerColor, texcoord);
-    }
+    if(depth < min_depth)
+        color = tex2D(samplerColor, texcoord);
     
     return color;
 }

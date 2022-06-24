@@ -3,6 +3,21 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
+## 1.3.0
+- Major Changes
+  - Added a new shader: Radial Slit Scan.
+    - Behaves similar to the animated version of Slit Scan, but by scanning a circle instead of a column of pixels.
+  - Added Blending modes to Slit Scan.
+    - Reminder: You will still need Blending.fxh from the crosire ReShade repo found [here](https://github.com/crosire/reshade-shaders/blob/slim/Shaders/Blending.fxh).
+  - Reworked Depth handling by replacing the Depth Mode and Depth Threshold parameters with Depth Bounds and Minimum Depth. This should make for much more versatile depth masking for the following shaders:
+    - Swirl
+    - Wave
+    - Bulge/Pinch
+    - Zigzag
+    - Drunk
+    - Slit Scan (Minimum Depth only)
+    - Radial Slit Scan (Minimum Depth only)
+    - Spliced Radials
 ## V1.2.4
 - Minor Changes
   - Updated README

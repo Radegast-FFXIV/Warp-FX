@@ -1,4 +1,4 @@
-#include "Include/RadegastShaders.Depth.fxh"
+#include "Include/RadegastShaders.BlendingModes.fxh"
 
 uniform float x_col <
     #if __RESHADE__ < 40000
@@ -50,3 +50,12 @@ uniform float2 anim_rate <
     step = 0.001;
     smoothing = 0.0;
 >;
+
+uniform float min_depth <
+    ui_type = "slider";
+    ui_label="Minimum Depth";
+    ui_tooltip="Unmasks anything before a set depth.";
+    ui_category="Depth";
+    ui_min=0.0;
+    ui_max=1.0;
+> = 0;

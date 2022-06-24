@@ -1,25 +1,17 @@
-uniform float depth_threshold <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else 
-        ui_type = "slider";
-    #endif
-    ui_label="Depth Threshold";
+uniform float2 depth_bounds <
+    ui_type = "slider";
+    ui_label = "Depth Bounds";
+    ui_category = "Depth";
+    ui_tooltip = "The depth bounds where the effect is calculated.";
+    min = 0.0;
+    max = 1.0;
+> = float2(0.0, 1.0);
+
+uniform float min_depth <
+    ui_type = "slider";
+    ui_label="Minimum Depth";
+    ui_tooltip="Unmasks anything before a set depth.";
     ui_category="Depth";
     ui_min=0.0;
     ui_max=1.0;
-> = 0;
-
-uniform int depth_mode <
-    ui_type = "combo";
-    ui_label = "Depth Mode";
-    ui_category="Depth";
-    ui_items = "Minimum\0Maximum\0";
-    ui_tooltip = "Mask the effect by using the depth of the scene.";
-> = 0;
-
-uniform bool set_max_depth_behind <
-    ui_label = "Set Distortion Behind Foreground";
-    ui_category="Depth";
-    ui_tooltip = "(Maximum Depth Threshold Mode only) When enabled, sets the distorted area behind the objects that should come in front of it.";
 > = 0;

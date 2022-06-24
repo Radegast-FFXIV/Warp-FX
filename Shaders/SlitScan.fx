@@ -148,14 +148,11 @@ void SlitScanPost(float4 pos : SV_Position, float2 texcoord : TEXCOORD0, out flo
             break;
     }
     
-    bool inDepthBounds;
-    if(depth_mode == 0)
-        inDepthBounds = depth >= depth_threshold;
-    else 
-        inDepthBounds = depth <= depth_threshold;
-
-    if(inDepthBounds)
-        color = lerp(screen, scanned, mask);
+    if(depth >= min_depth)
+        color = lerp(
+            screen, 
+            float4(ComHeaders::Blending::Blend(render_type, screen.rgb, scanned.rgb, blending_amount), 1.0), 
+            mask);
     else
         color = screen; 
 
