@@ -1,4 +1,4 @@
-#include "Include/RadegastShaders.Depth.fxh"
+#include "Include/RadegastShaders.BlendingModes.fxh"
 
 uniform float2 coordinates <
     #if __RESHADE__ < 40000
