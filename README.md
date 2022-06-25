@@ -3,6 +3,10 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
+## 1.3.1
+- Bug Fixes
+  - Fixed an issue with Radial Slit Scan redefining min_depth.
+  - Fixed an issue with Radial Slit Scan not using the Depth header.
 ## 1.3.0
 - Major Changes
   - Added a new shader: Radial Slit Scan.
