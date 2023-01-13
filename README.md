@@ -3,6 +3,10 @@
 A suite of shaders that in no way make your game look any more appealing. Use them anyways.
 
 # Changelog
+## 1.3.2
+- Bug Fixes
+  - Fixed an issue with Slit Scan causing the newest version of ReShade to fail.
+  - Removed "Number of Splices" as a parameter from Swirl as it only belongs to Spliced Radials.
 ## 1.3.1
 - Bug Fixes
   - Fixed an issue with Radial Slit Scan redefining min_depth.
@@ -115,3 +119,8 @@ Scans a column of pixels and outputs them to a sliding buffer to the side.
 
 A port of the OBS StreamFX filter with the same name. This shader behaves similarly to the
 original version of the Drunk shader. The newer version will be implemented in the future.
+
+## Radial Slit Scan
+
+A variation on the original Slit Scan shader. Instead of a column of pixels being scanned at a time, a 
+circle grows from a specified point and scans across its radius. Can make for some interesting images.
