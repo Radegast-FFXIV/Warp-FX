@@ -14,11 +14,6 @@ sampler samplerColor
     AddressU = MIRROR;
     AddressV = MIRROR;
     AddressW = MIRROR;
-
-    Width = BUFFER_WIDTH;
-    Height = BUFFER_HEIGHT;
-    Format = RGBA16;
-    
 };
 
 // Pixel Shaders (in order of appearance in the technique)

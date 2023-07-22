@@ -10,15 +10,11 @@ texture texColorBuffer: COLOR;
 texture ssTexture {
     Height = BUFFER_HEIGHT;
     Width = BUFFER_WIDTH;
+    Format = RGBA16;
 };
 
 sampler samplerColor {
     Texture = texColorBuffer;
-
-    Width = BUFFER_WIDTH;
-    Height = BUFFER_HEIGHT;
-    Format = RGBA16;
-    
 };
 
 sampler ssTarget {

@@ -15,9 +15,6 @@ sampler samplerColor
     AddressV = MIRROR;
     AddressW = MIRROR;
 
-    Width = BUFFER_WIDTH;
-    Height = BUFFER_HEIGHT;
-    Format = RGBA16;
     
 };
 
