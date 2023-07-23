@@ -23,10 +23,6 @@ sampler ssTarget {
     AddressU = WRAP;
     AddressV = WRAP;
     AddressW = WRAP;
-
-    Height = BUFFER_HEIGHT;
-    Width = BUFFER_WIDTH;
-    Format = RGBA16;
 };
 
 float get_pix_w() {
