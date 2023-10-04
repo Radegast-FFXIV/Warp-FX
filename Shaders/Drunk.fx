@@ -26,7 +26,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include "Include/Drunk.fxh"
-#include "ReShade.fxh"
+#include "../ReShade.fxh"
 
 texture texColorBuffer : COLOR;
 
@@ -57,14 +57,14 @@ sampler samplerColor
     SRGBTexture = false;
 };
 
-sampler result 
+sampler result
 {
     Texture = drunkDistortTarget;
 };
 
 // Helper Functions
 float random_time_at(uint i) {
-     
+
     const float x[] = { .2, .8, -.2, .452, -.2832, .8,
                     -.28, -1, -.42, -.89, .72, -.29,
                        .75, .25, .33, .67, .98, .01,
@@ -78,11 +78,11 @@ float random_time_at(uint i) {
 float2 mult_at(int x, int y) {
 	float x2 = fmod(x, 2.);
 	float y2 = fmod(y, 2.);
-	
+
 	float2 mult;
 	mult.x = (x2 < 1.) ? -1. : 1.;
 	mult.y = (y2 < 1.) ? -1. : 1.;
-	
+
 	return mult;
 }
 
@@ -90,7 +90,7 @@ float2 mult_at(int x, int y) {
 float2 index_UV(uint i, float2 tc) {
     const uint x = i/6;
     const uint y = i%6;
-    
+
     const float theta = radians(angle) * sin(anim_rate * 0.0005 * angle_speed);
 
 	float2 off = float2(0, 0);
@@ -110,7 +110,7 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
 {
     texcoord.x = (id == 2) ? 2.0 : 0.0;
     texcoord.y = (id == 1) ? 2.0 : 0.0;
-    
+
     position = float4(texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
 }
 
@@ -120,7 +120,7 @@ float4 PSDrunkStage1(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
 	float2 fade = frac(texcoord.xy * MAX_LINE);
 	fade = (sin((fade - 0.5) * 3.14159265) + 1.0) * 0.5;
-	
+
 
 	int2 _low = int2(floor(texcoord.xy * MAX_LINE));
 	int2 _hig = int2(ceil(texcoord.xy * MAX_LINE));
@@ -141,12 +141,12 @@ float4 PSDrunkStage1(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV
     float4 result = tex2D(samplerColor, uv);
     float out_depth = ReShade::GetLinearizedDepth(uv).r;
     bool inDepthBounds = out_depth >= depth_bounds.x && out_depth <= depth_bounds.y;
-    
+
     if(inDepthBounds)
         result.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, result.rgb, blending_amount);
     else result = base;
-	
-    if(depth < min_depth) 
+
+    if(depth < min_depth)
         result = tex2D(samplerColor, texcoord);
 
     return result;
@@ -157,6 +157,6 @@ technique Drunk <ui_label="Drunk";>
 	pass
 	{
 		VertexShader = FullScreenVS;
-		PixelShader  = PSDrunkStage1; 
+		PixelShader  = PSDrunkStage1;
 	}
 }

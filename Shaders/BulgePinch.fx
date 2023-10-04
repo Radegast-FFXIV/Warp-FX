@@ -1,8 +1,8 @@
 /*-----------------------------------------------------------------------------------------------------*/
-/* PBDistort Shader v6.0 - by Radegast Stravinsky of Ultros.                                               */
+/* Bulge/Pinch Shader - by Radegast Stravinsky of Ultros.                                              */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
-#include "ReShade.fxh"
+#include "../ReShade.fxh"
 #include "Include/BulgePinch.fxh"
 
 texture texColorBuffer : COLOR;
@@ -34,7 +34,7 @@ sampler samplerColor
     SRGBTexture = false;
 };
 
-sampler result 
+sampler result
 {
     Texture = pbDistortTarget;
 };
@@ -44,7 +44,7 @@ void FullScreenVS(uint id : SV_VertexID, out float4 position : SV_Position, out 
 {
     texcoord.x = (id == 2) ? 2.0 : 0.0;
     texcoord.y = (id == 1) ? 2.0 : 0.0;
-    
+
     position = float4( texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
     //position /= BUFFER_HEIGHT/BUFFER_WIDTH;
 
@@ -57,7 +57,7 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
 
     float2 center = coordinates / 2.0;
-    if (use_mouse_point) 
+    if (use_mouse_point)
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
 
     float2 offset_center = offset_coords / 2.0;
@@ -85,13 +85,13 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
     if(use_offset_coords) {
         tc += (2 * offset_center);
     }
-    else 
+    else
         tc += (2 * center);
     tc.x *= ar;
 
     float out_depth = ReShade::GetLinearizedDepth(tc).r;
     bool inDepthBounds = out_depth >= depth_bounds.x && out_depth <= depth_bounds.y;
- 
+
     float blending_factor;
     if(render_type)
         blending_factor = lerp(0, 1 - percent, blending_amount);
@@ -116,7 +116,7 @@ float4 PBDistort(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TAR
 
     if(depth < min_depth)
         color = tex2D(samplerColor, texcoord);
-    
+
     return color;
 }
 

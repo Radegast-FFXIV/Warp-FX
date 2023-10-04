@@ -2,7 +2,7 @@
 /* Wave Shader - by Radegast Stravinsky of Ultros.                                                */
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
-#include "ReShade.fxh"
+#include "../ReShade.fxh"
 #include "Include/Wave.fxh"
 
 texture texColorBuffer : COLOR;
@@ -35,7 +35,7 @@ sampler samplerColor
     SRGBTexture = false;
 };
 
-float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET 
+float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 {
     const float ar = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
     const float2 center = float2(0.5 / ar, 0.5);
@@ -47,7 +47,7 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     tc.x /= ar;
 
     const float theta = radians(animate == 3 ? (anim_rate * 0.01 % 360.0) : angle);
-    float2 sc; 
+    float2 sc;
     float2 _sc;
     sincos(theta, sc.y, sc.x);
     sincos(-theta, _sc.y, _sc.x);
@@ -87,7 +87,7 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         blending_factor = lerp(0, abs(amplitude)* lerp(10, 1, abs(amplitude)), blending_amount);
     else
         blending_factor = blending_amount;
-    
+
     color.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, color.rgb, blending_factor);
 
 
@@ -96,7 +96,7 @@ float4 Wave(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
 
     if(inDepthBounds){
         color = tex2D(samplerColor, tc);
-    
+
         color.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, color.rgb, blending_factor);
     }
     else

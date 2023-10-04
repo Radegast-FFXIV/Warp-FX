@@ -3,19 +3,19 @@
 /* There are plenty of shaders that make your game look amazing. This isn't one of them.               */
 /*-----------------------------------------------------------------------------------------------------*/
 #include "Include/SplicedRadials.fxh"
-#include "ReShade.fxh"
+#include "../ReShade.fxh"
 
 texture texColorBuffer : COLOR;
 
 sampler samplerColor
 {
     Texture = texColorBuffer;
-    
+
     AddressU = MIRROR;
     AddressV = MIRROR;
     AddressW = MIRROR;
 
-    
+
 };
 
 // Vertex Shader
@@ -45,7 +45,7 @@ float4 SplicedRadialsPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) :
     float2 center = coordinates  / 2.0;
     float2 offset_center = offset_coords / 2.0;
 
-    if (use_mouse_point) 
+    if (use_mouse_point)
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
 
     float2 tc = texcoord - center;
@@ -61,8 +61,8 @@ float4 SplicedRadialsPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) :
     const float dist_radius = radius-dist;
     const float tension_radius = lerp(radius-dist, radius, tension);
     const float tension_dist = lerp(dist_radius, tension_radius, tension);
-    float percent; 
-    float theta; 
+    float percent;
+    float theta;
 
     float splice_width = (tension_radius-inner_radius) / number_splices;
     splice_width = frac(splice_width);
@@ -78,13 +78,13 @@ float4 SplicedRadialsPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) :
     if(use_offset_coords) {
         tc += (2 * offset_center);
     }
-    else 
+    else
         tc += (2 * center);
-    tc.x *= ar;  
-        
+    tc.x *= ar;
+
     float out_depth = ReShade::GetLinearizedDepth(tc).r;
     bool inDepthBounds = out_depth >= depth_bounds.x && out_depth <= depth_bounds.y;
-   
+
     if (inDepthBounds)
     {
         if(use_offset_coords)
@@ -95,7 +95,7 @@ float4 SplicedRadialsPS(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) :
                 color = tex2D(samplerColor, texcoord);
         } else
             color = tex2D(samplerColor, tc);
-        
+
         if(dist <= radius)
             color.rgb = ComHeaders::Blending::Blend(render_type, base.rgb, color.rgb, blending_amount);
     }
