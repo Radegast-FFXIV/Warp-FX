@@ -1,16 +1,5 @@
 #include "Include/RadegastShaders.BlendingModes.fxh"
-
-uniform float2 coordinates <
-    #if __RESHADE__ < 40000
-        ui_type = "drag";
-    #else
-        ui_type = "slider";
-    #endif
-    ui_label="Coordinates";
-    ui_tooltip="The X and Y position of the center of the effect.";
-    ui_min = 0.0; 
-    ui_max = 1.0;
-> = float2(0.5, 0.5);
+#include "Include/RadegastShaders.Positional.fxh"
 
 uniform int animate <
     ui_type = "combo";
