@@ -1,4 +1,4 @@
-#include "../../Blending.fxh"
+#include "Blending.fxh"
 
 BLENDING_COMBO(
     render_type, 
