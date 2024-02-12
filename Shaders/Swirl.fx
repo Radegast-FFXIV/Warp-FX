@@ -22,7 +22,7 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     float4 base = tex2D(samplerColor, texcoord);
     const float ar_raw = 1.0 * (float)BUFFER_HEIGHT / (float)BUFFER_WIDTH;
     float ar = lerp(ar_raw, 1, aspect_ratio * 0.01);
-
+    float ar_angle = ar * sin(radians(aspect_ratio_angle));
     const float depth = ReShade::GetLinearizedDepth(texcoord).r;
     float2 center = float2(x_coord, y_coord)  / 2.0;
     float2 offset_center = float2(offset_x, offset_y) / 2.0;
@@ -31,13 +31,15 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         center = float2(mouse_coordinates.x * BUFFER_RCP_WIDTH / 2.0, mouse_coordinates.y * BUFFER_RCP_HEIGHT / 2.0);
 
     float2 tc = texcoord - center;
+    tc = mul(swirlTransform(radians(aspect_ratio_angle)), tc);
 
     float4 color;
 
-    center.x /= ar;
-    offset_center.x /= ar;
+    center.x /= ar_angle;
+    offset_center.x /= ar_angle;
 
-    tc.x /= ar;
+    tc.x /= ar_angle;
+
 
     const float dist = distance(tc, center);
     const float dist_radius = radius-dist;
@@ -54,13 +56,18 @@ float4 Swirl(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
         percent = 1;
     theta = percent * percent * radians(angle * (animate == 1 ? sin(anim_rate * 0.0005) : 1.0));
 
-    tc = mul(swirlTransform(theta), tc-center);
+    tc -= center;
+    tc = mul(swirlTransform(theta), tc);
+
     if(use_offset_coords) {
         tc += (2 * offset_center);
     }
     else
         tc += (2 * center);
-    tc.x *= ar;
+
+
+    tc.x *= ar_angle;
+    tc = mul(swirlTransform(radians(-aspect_ratio_angle)), tc);
 
     float out_depth = ReShade::GetLinearizedDepth(tc).r;
     bool inDepthBounds = out_depth >= depth_bounds.x && out_depth <= depth_bounds.y;
