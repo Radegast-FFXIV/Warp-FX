@@ -1,10 +1,13 @@
-#include "Include/RadegastShaders.Depth.fxh"
-#include "Include/RadegastShaders.Positional.fxh"
-#include "Include/RadegastShaders.Radial.fxh"
-#include "Include/RadegastShaders.AspectRatio.fxh"
-#include "Include/RadegastShaders.Offsets.fxh"
-#include "Include/RadegastShaders.Transforms.fxh"
-#include "Include/RadegastShaders.BlendingModes.fxh"
+#define ANIMATE_NY
+
+#include "Include/WarpFX.Animate.fxh"
+#include "Include/WarpFX.Depth.fxh"
+#include "Include/WarpFX.Positional.fxh"
+#include "Include/WarpFX.Radial.fxh"
+#include "Include/WarpFX.AspectRatio.fxh"
+#include "Include/WarpFX.Offsets.fxh"
+#include "Include/WarpFX.Transforms.fxh"
+#include "Include/WarpFX.BlendingModes.fxh"
 
 uniform float magnitude <
     #if __RESHADE__ < 40000
@@ -19,14 +22,3 @@ uniform float magnitude <
     ui_category = "Properties";
 > = -0.5;
 
-uniform int animate <
-    ui_type = "combo";
-    ui_label = "Animate";
-    ui_items = "No\0Yes\0";
-    ui_tooltip = "Animates the effect.";
-    ui_category = "Properties";
-> = 0;
-
-uniform float anim_rate <
-    source = "timer";
->;

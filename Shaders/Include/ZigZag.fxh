@@ -1,18 +1,13 @@
-#include "Include/RadegastShaders.Depth.fxh"
-#include "Include/RadegastShaders.Positional.fxh"
-#include "Include/RadegastShaders.Radial.fxh"
-#include "Include/RadegastShaders.AspectRatio.fxh"
-#include "Include/RadegastShaders.Offsets.fxh"
-#include "Include/RadegastShaders.Transforms.fxh"
-#include "Include/RadegastShaders.BlendingModes.fxh"
+#define ANIMATE_AP
 
-uniform int mode <
-    ui_type = "combo";
-    ui_label = "Mode";
-    ui_items = "Around center\0Out from center\0";
-    ui_tooltip = "Selects the mode the distortion should be processed through.";
-    ui_category = "Properties";
-> = 0;
+#include "Include/WarpFX.Animate.fxh"
+#include "Include/WarpFX.Depth.fxh"
+#include "Include/WarpFX.Positional.fxh"
+#include "Include/WarpFX.Radial.fxh"
+#include "Include/WarpFX.AspectRatio.fxh"
+#include "Include/WarpFX.Offsets.fxh"
+#include "Include/WarpFX.Transforms.fxh"
+#include "Include/WarpFX.BlendingModes.fxh"
 
 uniform float angle <
     #if __RESHADE__ < 40000
@@ -67,15 +62,3 @@ uniform float phase <
     ui_min = -5.0; 
     ui_max = 5.0;
 > = 0.0;
-
-uniform int animate <
-    ui_type = "combo";
-    ui_label = "Animate";
-    ui_items = "No\0Amplitude\0Phase\0";
-    ui_tooltip = "Enable or disable the animation. Animates the zigzag effect by phase or by amplitude.";
-    ui_category = "Properties";
-> = 0;
-
-uniform float anim_rate <
-    source = "timer";
->;

@@ -47,13 +47,9 @@ float4 ZigZag(float4 pos : SV_Position, float2 texcoord : TEXCOORD0) : SV_TARGET
     const float tension_radius = lerp(radius-dist, radius, tension);
     const float percent = max(radius-dist, 0) / tension_radius;
     const float percentSquared = percent * percent;
-    const float theta = percentSquared * (animate == 1 ? amplitude * sin(anim_rate * 0.0005) : amplitude) * sin(percentSquared / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate : 0)));
+    const float theta = percentSquared * (animate == 1 ? amplitude * sin(anim_rate * 0.0005 * anim_rate_multiplier) : amplitude) * sin(percentSquared / period * radians(angle) + (phase + (animate == 2 ? 0.00075 * anim_rate * anim_rate_multiplier : 0)));
 
-    if(!mode) {
-        tc = mul(swirlTransform(theta), tc-center);
-    } else {
-        tc = mul(zigzagTransform(theta), tc-center);
-    }
+    tc = mul(swirlTransform(theta), tc-center);
 
     if(use_offset_coords)
         tc += (offset_center);

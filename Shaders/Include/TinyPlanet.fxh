@@ -1,5 +1,5 @@
-#include "Include/RadegastShaders.Transforms.fxh"
-#include "Include/RadegastShaders.Positional.fxh"
+#include "Include/WarpFX.Transforms.fxh"
+#include "Include/WarpFX.Positional.fxh"
 
 #define PI 3.141592358
 

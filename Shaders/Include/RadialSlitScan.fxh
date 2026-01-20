@@ -1,5 +1,5 @@
-#include "Include/RadegastShaders.BlendingModes.fxh"
-#include "Include/RadegastShaders.Positional.fxh"
+#include "Include/WarpFX.BlendingModes.fxh"
+#include "Include/WarpFX.Positional.fxh"
 
 uniform int animate <
     ui_type = "combo";

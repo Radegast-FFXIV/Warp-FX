@@ -1,4 +1,4 @@
-#include "Include/RadegastShaders.BlendingModes.fxh"
+#include "Include/WarpFX.BlendingModes.fxh"
 
 uniform float x_col <
     #if __RESHADE__ < 40000

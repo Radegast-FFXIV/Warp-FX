@@ -1,5 +1,8 @@
-#include "Include/RadegastShaders.Depth.fxh"
-#include "Include/RadegastShaders.BlendingModes.fxh"
+#define ANIMATE_APA
+
+#include "Include/WarpFX.Animate.fxh"
+#include "Include/WarpFX.Depth.fxh"
+#include "Include/WarpFX.BlendingModes.fxh"
 
 uniform int wave_type <
     ui_type = "combo";
@@ -61,15 +64,3 @@ uniform float phase <
     ui_max = 5.0;
     ui_tooltip = "The offset being applied to the distortion's waves.";
 > = 0.0;
-
-uniform int animate <
-    ui_type = "combo";
-    ui_label = "Animate";
-    ui_items = "No\0Amplitude\0Phase\0Angle\0";
-    ui_tooltip = "Enable or disable the animation. Animates the wave effect by phase, amplitude, or angle.";
-    ui_category = "Properties";
-> = 0;
-
-uniform float anim_rate <
-    source = "timer";
->;
